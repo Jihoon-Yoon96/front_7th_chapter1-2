@@ -55,6 +55,11 @@
     });
     ```
 
+### 5. [Post-Completion Action] (작업 완료 후 조치)
+- TDD의 각 사이클 단계(RED, GREEN, REFACTOR)가 마무리되면, 다음 커밋을 수행해야 합니다:
+    - `git add .`
+    - `git commit -m "COMMIT - ({TDD 단계 이름}) [{스토리 제목}] 검토 및 피드백 완료"`
+
 ---
 ## ✅ Compliance Checklist
 - [ ] 테스트 로그를 정확히 분석하여 RED/GREEN 상태를 판단했는가?

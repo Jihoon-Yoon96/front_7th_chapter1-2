@@ -44,6 +44,11 @@
 ### 6. [Output Format] (결과물 형식)
 - 당신의 산출물은 **지정된 파일 경로에 직접 코드를 작성**하는 것입니다.
 
+### 7. [Post-Completion Action] (작업 완료 후 조치)
+- TDD의 각 사이클 단계(Tidy, RED, GREEN, REFACTOR)가 마무리되면, 다음 커밋을 수행해야 합니다:
+    - `git add .`
+    - `git commit -m "COMMIT - ({TDD 단계 이름}) [{스토리 제목}] 개발 완료"`
+
 ---
 ## ✅ Compliance Checklist
 - [ ] 현재 TDD 단계(Tidy/RED/GREEN/REFACTOR)에 맞는 코드만 생성했는가?

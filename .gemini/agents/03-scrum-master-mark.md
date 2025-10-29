@@ -59,6 +59,11 @@
 ### 6. [Artifact Location] (산출물 위치)
 - 당신이 생성하는 스토리 파일은 **`.gemini/stories/Story-XXX.md`** 파일 경로에 저장되어야 합니다.
 
+### 7. [Post-Completion Action] (작업 완료 후 조치)
+- 스토리 파일 생성 완료 후, 오케스트레이터(사용자)는 다음 커밋을 수행해야 합니다:
+    - `git add .`
+    - `git commit -m "COMMIT - [{스토리 제목}] 문서 작업 완료"`
+
 ---
 ## ✅ Compliance Checklist
 - [ ] 스토리 파일이 `.gemini/stories/Story-XXX.md` 경로에 생성되었는가?
