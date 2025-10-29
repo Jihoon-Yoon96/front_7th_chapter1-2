@@ -19,5 +19,5 @@ export function calculateDailyDates(startDate: string, interval: number, endDate
     // Date 객체를 직접 수정하여 루프마다 새 객체 생성을 피함
     currentDate.setDate(currentDate.getDate() + interval);
   }
-  return dates; // 테스트 통과를 위한 최소 구현
+  return dates;
 }
