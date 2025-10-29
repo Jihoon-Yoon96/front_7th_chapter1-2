@@ -21,3 +21,7 @@ export function calculateDailyDates(startDate: string, interval: number, endDate
   }
   return dates;
 }
+
+export function calculateWeeklyDates(): string[] {
+  return []; // Placeholder for RED stage
+}
