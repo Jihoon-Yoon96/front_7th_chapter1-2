@@ -22,6 +22,7 @@
   - **User Story:** `.gemini/PRD.md`에서 가져온 관련 사용자 스토리 및 수용 기준.
   - **Architecture:** `.gemini/Architecture.md`에서 가져온 관련 기술 설계 (예: "반드시 'seriesId' 사용").
   - **File Paths:** 수정되거나 생성되어야 할 구체적인 파일 목록 (예: `src/utils/repeatUtils.ts` (신규), `src/__tests__/utils/repeatUtils.spec.ts` (신규), `src/hooks/useEventOperations.ts` (수정)).
+  - **UI Flow for Integration Test (통합 테스트용 UI 플로우):** 기능이 UI를 포함하는 경우, 브라이언이 통합 테스트 디스크립션을 작성하는 데 필요한 상세 UI 인터랙션 및 플로우를 명시합니다.
 
 ### 3. [Task Breakdown]
 *(2. 작업 분해: 스토리는 TDD 한 사이클(RED-GREEN-REFACTOR)에 끝낼 수 있을 만큼 작아야 합니다.)*
@@ -62,7 +63,11 @@
 ### 7. [Post-Completion Action] (작업 완료 후 조치)
 - 스토리 파일 생성 완료 후, 오케스트레이터(사용자)는 다음 커밋을 수행해야 합니다:
     - `git add .`
-    - `git commit -m "COMMIT - [{스토리 제목}] 문서 작업 완료"`
+    - `git commit -m "COMMIT - {스토리 제목} 문서 작업 완료"`
+
+### 8. [Test Progression Order] (테스트 진행 순서)
+- 각 개발 스토리는 **단위 테스트(Unit Test) TDD 사이클을 먼저 완료한 후, 통합 테스트(Integration Test) TDD 사이클을 진행**하도록 구성되어야 합니다.
+- 스토리 파일 내에서 이 진행 순서가 명확히 제시되어야 합니다.
 
 ---
 ## ✅ Compliance Checklist
@@ -113,6 +118,12 @@
     ## File Paths
     - **신규 생성:** `src/utils/repeatUtils.ts`
     - **신규 생성:** `src/__tests__/utils/repeatUtils.spec.ts`
+
+    ---
+    ## UI Flow for Integration Test (통합 테스트용 UI 플로우)
+    - 일정 반복을 체크하면 반복 주기를 입력할 영역이 나온다.
+    - 해당 영역에는 '반복주기'를 고를 수 있는 영역이며, 셀렉트 박스로 '매일, 매주, 매월, 요일지정, 사용자화'의 선택지가 있다.
+    - '요일지정' 선택 시 '월~일'이 적힌 체크박스 7개가 노출되고, '사용자화' 선택시 반복 주기를 숫자로 입력가능하다.
 
     ---
     ## Commit Messages
