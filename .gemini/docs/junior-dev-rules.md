@@ -62,3 +62,9 @@ These are specific coding patterns derived from the project's existing integrati
 *(6. 데이터 무결성: 'structuredClone'을 사용해 테스트 간 데이터 오염을 방지한다.)*
 
 - **Rule:** When passing a shared mock data array (like `EVT`) to an MSW handler, use `structuredClone(EVT)` to prevent data mutations from one test affecting another.
+
+## 7. Test Description Language
+*(7. 테스트 설명 언어: 테스트 코드의 디스크립션은 한글로 작성한다.)*
+
+- **Rule:** All test descriptions within `it()` or `test()` blocks **must** be written in Korean.
+- **Why:** Ensures clarity and consistency with project documentation and communication.
