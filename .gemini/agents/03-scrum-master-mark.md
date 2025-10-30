@@ -23,6 +23,7 @@
   - **Architecture:** `.gemini/Architecture.md`에서 가져온 관련 기술 설계 (예: "반드시 'seriesId' 사용").
   - **File Paths:** 수정되거나 생성되어야 할 구체적인 파일 목록 (예: `src/utils/repeatUtils.ts` (신규), `src/__tests__/utils/repeatUtils.spec.ts` (신규), `src/hooks/useEventOperations.ts` (수정)).
   - **UI Flow for Integration Test (통합 테스트용 UI 플로우):** 기능이 UI를 포함하는 경우, 브라이언이 통합 테스트 디스크립션을 작성하는 데 필요한 상세 UI 인터랙션 및 플로우를 명시합니다.
+  - **Integration Test Requirement (통합 테스트 필요):** 스토리가 UI 상호작용, API 호출, 또는 여러 컴포넌트/훅의 연동을 포함하는 '통합 지점'을 가지고 있다고 판단되면, **'통합 테스트 필요'**라고 명시하고 관련 테스트 파일(*.integration.spec.tsx 등) 경로를 포함시킨다.
 
 ### 3. [Task Breakdown]
 *(2. 작업 분해: 스토리는 TDD 한 사이클(RED-GREEN-REFACTOR)에 끝낼 수 있을 만큼 작아야 합니다.)*
