@@ -1,5 +1,5 @@
 // src/__tests__/utils/repeatUtils.spec.ts
-import { calculateDailyDates } from '../../utils/repeatUtils';
+import { calculateDailyDates, calculateWeeklyDates } from '../../utils/repeatUtils';
 import { afterEach } from 'vitest';
 
 describe('calculateDailyDates', () => {
@@ -56,43 +56,65 @@ describe('calculateWeeklyDates', () => {
 })
 
   it('간격이 1이고 특정 요일이 선택되었을 때 매주 반복되는 날짜를 올바르게 생성해야 한다', () => {
-    // TODO: 테스트 코드 작성
-    let interval = 1;
-    let result = ['2025-11-01', '2025-11-08']
-    expect(calculateDailyDates(start, interval, end)).toEqual(result)
-
+    const startDate = '2025-11-03'; // 월요일
+    const endDate = '2025-11-10';
+    const interval = 1;
+    const daysOfWeek = [1]; // 월요일
+    const expectedDates = ['2025-11-03', '2025-11-10'];
+    expect(calculateWeeklyDates(startDate, interval, daysOfWeek, endDate)).toEqual(expectedDates);
   });
 
   it('간격이 2이고 특정 요일이 선택되었을 때 격주로 반복되는 날짜를 올바르게 생성해야 한다', () => {
-    // TODO: 테스트 코드 작성
-    let interval = 2
-    let result = ['2025-11-01', '2025-11-07']
-    expect(calculateDailyDates(start, interval, end)).toEqual(result)
+    const startDate = '2025-11-03'; // 월요일
+    const endDate = '2025-11-17';
+    const interval = 2;
+    const daysOfWeek = [1]; // 월요일
+    const expectedDates = ['2025-11-03', '2025-11-17']; // 2주 간격 월요일
+    expect(calculateWeeklyDates(startDate, interval, daysOfWeek, endDate)).toEqual(expectedDates);
   });
 
   it('간격이 0 이하일 경우 빈 배열을 반환해야 한다', () => {
-    // TODO: 테스트 코드 작성
-    let interval = 0
-    let result = []
-    expect(calculateDailyDates(start, interval, end)).toEqual(result)
+    const startDate = '2025-11-03';
+    const endDate = '2025-11-10';
+    const interval = 0; // Invalid interval
+    const daysOfWeek = [1]; // 월요일
+    const expectedDates: string[] = [];
+    expect(calculateWeeklyDates(startDate, interval, daysOfWeek, endDate)).toEqual(expectedDates);
   });
 
-  it('시작일과 종료일이 같으면 빈 배열을 반환해야 한다', () => {
-    // TODO: 테스트 코드 작성
-    let interval = 0
-    let result = []
-    expect(calculateDailyDates(start, interval, start)).toEqual(result)
+  it('시작일과 종료일이 같을 때를 처리해야 한다', () => {
+    const startDate = '2025-11-03'; // 월요일
+    const endDate = '2025-11-03';
+    const interval = 1;
+    const daysOfWeek = [1]; // 월요일
+    const expectedDates = ['2025-11-03'];
+    expect(calculateWeeklyDates(startDate, interval, daysOfWeek, endDate)).toEqual(expectedDates);
   });
 
   it('종료일을 초과하는 날짜를 생성하지 않아야 한다', () => {
-    // TODO: 테스트 코드 작성
+    const startDate = '2025-11-03'; // 월요일
+    const endDate = '2025-11-04'; // 화요일
+    const interval = 1;
+    const daysOfWeek = [1]; // 월요일
+    const expectedDates = ['2025-11-03'];
+    expect(calculateWeeklyDates(startDate, interval, daysOfWeek, endDate)).toEqual(expectedDates);
   });
 
   it('선택된 요일이 시작일 이전에 있을 경우 시작일부터 일정을 생성해야 한다', () => {
-    // TODO: 테스트 코드 작성
+    const startDate = '2025-11-05'; // 수요일
+    const endDate = '2025-11-12';
+    const interval = 1;
+    const daysOfWeek = [1]; // 월요일 (시작일 이전)
+    const expectedDates = ['2025-11-10']; // 다음 월요일부터 시작
+    expect(calculateWeeklyDates(startDate, interval, daysOfWeek, endDate)).toEqual(expectedDates);
   });
 
   it('선택된 요일이 종료일 이후에 있을 경우 일정을 생성하지 않아야 한다', () => {
-    // TODO: 테스트 코드 작성
+    const startDate = '2025-11-03'; // 월요일
+    const endDate = '2025-11-04'; // 화요일
+    const interval = 1;
+    const daysOfWeek = [3]; // 수요일 (종료일 이후)
+    const expectedDates: string[] = [];
+    expect(calculateWeeklyDates(startDate, interval, daysOfWeek, endDate)).toEqual(expectedDates);
   });
 });
