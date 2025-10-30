@@ -1,5 +1,5 @@
 // src/__tests__/utils/repeatUtils.spec.ts
-import { calculateDailyDates, calculateWeeklyDates } from '../../utils/repeatUtils';
+import { calculateDailyDates, calculateWeeklyDates, calculateMonthlyDates } from '../../utils/repeatUtils';
 import { afterEach } from 'vitest';
 
 describe('calculateDailyDates', () => {
@@ -46,15 +46,6 @@ describe('calculateDailyDates', () => {
 }); // calculateDailyDates describe 블록 종료
 
 describe('calculateWeeklyDates', () => {
-  let start = '2025-11-01';
-  let end = '2025-11-07';
-
-  afterEach(()=>{
-    // 공통변수 초기화
-    start = '2025-11-01';
-    end = '2025-11-07';
-})
-
   it('간격이 1이고 특정 요일이 선택되었을 때 매주 반복되는 날짜를 올바르게 생성해야 한다', () => {
     const startDate = '2025-11-03'; // 월요일
     const endDate = '2025-11-10';
@@ -108,8 +99,7 @@ describe('calculateWeeklyDates', () => {
     const expectedDates = ['2025-11-10']; // 다음 월요일부터 시작
     expect(calculateWeeklyDates(startDate, interval, daysOfWeek, endDate)).toEqual(expectedDates);
   });
-
-
+});
 
 describe('calculateMonthlyDates', () => {
   it('간격이 1이고 특정 일자가 선택되었을 때 매월 반복되는 날짜를 올바르게 생성해야 한다', () => {
