@@ -51,6 +51,8 @@ import { getTimeErrorMessage } from './utils/timeValidation';
 
 const categories = ['업무', '개인', '가족', '기타'];
 
+const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
+
 
 
 const notificationOptions = [
@@ -83,6 +85,12 @@ function App() {
     setRepeatInterval,
     repeatEndDate,
     setRepeatEndDate,
+    daysOfWeek,
+    setDaysOfWeek,
+    dayOfMonth,
+    setDayOfMonth,
+    monthOfYear,
+    setMonthOfYear,
     notificationTime,
     setNotificationTime,
     startTimeError,
@@ -574,7 +582,7 @@ function App() {
           <DialogContentText>
             다음 일정과 겹칩니다:
             {overlappingEvents.map((event) => (
-              <Typography key={event.id}>
+              <Typography key={event.id} component="span" display="block">
                 {event.title} ({event.date} {event.startTime}-{event.endTime})
               </Typography>
             ))}
