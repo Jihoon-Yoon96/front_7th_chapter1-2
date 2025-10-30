@@ -339,7 +339,7 @@ it('notificationTime을 10으로 하면 지정 시간 10분 전 알람 텍스트
   });
 });
 
-
+// 반복일정 유형 선택 UI 구현 및 통합 테스트
 describe('반복 일정 유형 선택 UI 통합 테스트', () => {
   // const user = userEvent.setup();
 
