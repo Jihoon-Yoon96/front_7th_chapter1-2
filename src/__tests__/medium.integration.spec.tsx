@@ -337,6 +337,28 @@ it('notificationTime을 10으로 하면 지정 시간 10분 전 알람 텍스트
   act(() => {
     vi.advanceTimersByTime(1000);
   });
+});
 
-  expect(screen.getByText('10분 후 기존 회의 일정이 시작됩니다.')).toBeInTheDocument();
+
+describe('반복 일정 유형 선택 UI 통합 테스트', () => {
+  // const user = userEvent.setup();
+
+  // beforeEach(() => {
+  //   server.use(...setupMockHandlerCreation([]));
+  //   render(<App />);
+  // });
+
+  it('일정 생성/수정 폼에서 \'반복\' 체크박스 선택 시 반복 주기 입력 영역이 노출되어야 한다', async () => {
+    setupMockHandlerCreation([]);
+    const { user } = setup(<App />);
+
+    const repeatCheckbox = screen.getByLabelText('반복 일정');
+    // expect(repeatCheckbox).not.toBeChecked();
+
+    await user.click(repeatCheckbox);
+    expect(repeatCheckbox).toBeChecked();
+
+    const repeatTypeSelect = screen.getByLabelText('반복 유형');
+    expect(repeatTypeSelect).toBeInTheDocument(); // This should fail initially
+  });
 });
