@@ -112,3 +112,7 @@ export function calculateMonthlyDates(
 
   return dates;
 }
+
+export function calculateYearlyDates(): string[] {
+  return []; // Placeholder for RED stage
+}

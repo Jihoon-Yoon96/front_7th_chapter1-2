@@ -1,5 +1,5 @@
 // src/__tests__/utils/repeatUtils.spec.ts
-import { calculateDailyDates, calculateWeeklyDates, calculateMonthlyDates } from '../../utils/repeatUtils';
+import { calculateDailyDates, calculateWeeklyDates, calculateMonthlyDates, calculateYearlyDates } from '../../utils/repeatUtils';
 import { afterEach } from 'vitest';
 
 describe('calculateDailyDates', () => {
@@ -109,5 +109,17 @@ describe('calculateMonthlyDates', () => {
     const dayOfMonth = 15;
     const expectedDates = ['2025-01-15', '2025-02-15', '2025-03-15'];
     expect(calculateMonthlyDates(startDate, interval, dayOfMonth, endDate)).toEqual(expectedDates);
+  });
+});
+
+describe('calculateYearlyDates', () => {
+  it('간격이 1이고 특정 월/일이 선택되었을 때 매년 반복되는 날짜를 올바르게 생성해야 한다', () => {
+    const startDate = '2025-01-15';
+    const endDate = '2027-01-15';
+    const interval = 1;
+    const month = 0; // January (0-indexed)
+    const dayOfMonth = 15;
+    const expectedDates = ['2025-01-15', '2026-01-15', '2027-01-15'];
+    expect(calculateYearlyDates(startDate, interval, month, dayOfMonth, endDate)).toEqual(expectedDates);
   });
 });
