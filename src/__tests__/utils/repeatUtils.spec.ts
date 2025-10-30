@@ -42,7 +42,8 @@ describe('calculateDailyDates', () => {
     const interval = 2;
     const expectedDates = ['2025-11-01'];
     expect(calculateDailyDates(startDate, interval, endDate)).toEqual(expectedDates);
-
+  });
+}); // calculateDailyDates describe 블록 종료
 
 describe('calculateWeeklyDates', () => {
   let start = '2025-11-01';

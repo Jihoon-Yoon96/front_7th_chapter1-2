@@ -22,6 +22,40 @@ export function calculateDailyDates(startDate: string, interval: number, endDate
   return dates;
 }
 
-export function calculateWeeklyDates(): string[] {
-  return []; // Placeholder for RED stage
+export function calculateWeeklyDates(
+  startDate: string,
+  interval: number,
+  daysOfWeek: number[], // 0: 일요일, 1: 월요일, ..., 6: 토요일
+  endDate: string
+): string[] {
+  const dates: string[] = [];
+  let current = new Date(startDate + 'T00:00:00');
+  const finalDate = new Date(endDate + 'T00:00:00');
+
+  if (interval <= 0 || daysOfWeek.length === 0) {
+    return [];
+  }
+
+  // 시작일이 속한 주의 시작(일요일)을 기준으로 주차 계산
+  const startOfWeek = new Date(current);
+  startOfWeek.setDate(current.getDate() - current.getDay()); // 일요일로 맞춤
+
+  let weekCount = 0;
+
+  while (current <= finalDate) {
+    const dayOfWeek = current.getDay(); // 0: 일요일, 1: 월요일, ...
+
+    // 현재 날짜가 시작일이 속한 주로부터 몇 번째 주인지 계산
+    const diffTime = Math.abs(current.getTime() - startOfWeek.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const currentWeek = Math.floor(diffDays / 7);
+
+    if (daysOfWeek.includes(dayOfWeek) && currentWeek % interval === 0) {
+      dates.push(current.toISOString().split('T')[0]);
+    }
+
+    current.setDate(current.getDate() + 1); // 다음 날짜로 이동
+  }
+
+  return dates;
 }
