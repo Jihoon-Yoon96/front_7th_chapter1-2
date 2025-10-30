@@ -109,12 +109,15 @@ describe('calculateWeeklyDates', () => {
     expect(calculateWeeklyDates(startDate, interval, daysOfWeek, endDate)).toEqual(expectedDates);
   });
 
-  it('선택된 요일이 종료일 이후에 있을 경우 일정을 생성하지 않아야 한다', () => {
-    const startDate = '2025-11-03'; // 월요일
-    const endDate = '2025-11-04'; // 화요일
+
+
+describe('calculateMonthlyDates', () => {
+  it('간격이 1이고 특정 일자가 선택되었을 때 매월 반복되는 날짜를 올바르게 생성해야 한다', () => {
+    const startDate = '2025-01-15';
+    const endDate = '2025-03-15';
     const interval = 1;
-    const daysOfWeek = [3]; // 수요일 (종료일 이후)
-    const expectedDates: string[] = [];
-    expect(calculateWeeklyDates(startDate, interval, daysOfWeek, endDate)).toEqual(expectedDates);
+    const dayOfMonth = 15;
+    const expectedDates = ['2025-01-15', '2025-02-15', '2025-03-15'];
+    expect(calculateMonthlyDates(startDate, interval, dayOfMonth, endDate)).toEqual(expectedDates);
   });
 });

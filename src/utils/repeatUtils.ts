@@ -57,3 +57,7 @@ export function calculateWeeklyDates(
 
   return dates;
 }
+
+export function calculateMonthlyDates(): string[] {
+  return []; // Placeholder for RED stage
+}
