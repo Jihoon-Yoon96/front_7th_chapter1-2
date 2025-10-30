@@ -1,13 +1,3 @@
-import {
-  Checkbox,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  MenuItem,
-  Select,
-  Stack,
-  TextField,
-} from '@mui/material';
 import { RepeatType } from '../types';
 
 interface RepeatOptionsProps {
@@ -41,102 +31,108 @@ export const RepeatOptions = ({
   monthOfYear,
   setMonthOfYear,
 }: RepeatOptionsProps) => {
+  const handleDayOfWeekChange = (index: number, checked: boolean) => {
+    if (checked) {
+      setDaysOfWeek([...daysOfWeek, index]);
+    } else {
+      setDaysOfWeek(daysOfWeek.filter((d) => d !== index));
+    }
+  };
+
   return (
-    <Stack spacing={2}>
-      <FormControl fullWidth>
-        <FormLabel id="repeat-type-label">반복 유형</FormLabel>
-        <Select
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <label htmlFor="repeat-type" id="repeat-type-label">반복 유형</label>
+        <select
           id="repeat-type"
           aria-labelledby="repeat-type-label"
-          size="small"
           value={repeatType}
           onChange={(e) => setRepeatType(e.target.value as RepeatType)}
+          style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
         >
-          <MenuItem value="none">없음</MenuItem>
-          <MenuItem value="daily">매일</MenuItem>
-          <MenuItem value="weekly">매주</MenuItem>
-          <MenuItem value="monthly">매월</MenuItem>
-          <MenuItem value="yearly">매년</MenuItem>
-        </Select>
-      </FormControl>
+          <option value="none">없음</option>
+          <option value="daily">매일</option>
+          <option value="weekly">매주</option>
+          <option value="monthly">매월</option>
+          <option value="yearly">매년</option>
+        </select>
+      </div>
 
       {repeatType === 'weekly' && (
-        <FormControl fullWidth>
-          <FormLabel>요일 선택</FormLabel>
-          <Stack direction="row" spacing={1}>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <label>요일 선택</label>
+          <div style={{ display: 'flex', gap: '8px' }}>
             {weekDays.map((day, index) => (
-              <FormControlLabel
-                key={day}
-                control={
-                  <Checkbox
-                    checked={daysOfWeek.includes(index)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setDaysOfWeek([...daysOfWeek, index]);
-                      } else {
-                        setDaysOfWeek(daysOfWeek.filter((d) => d !== index));
-                      }
-                    }}
-                  />
-                }
-                label={day}
-              />
+              <label key={day} style={{ display: 'flex', alignItems: 'center' }}>
+                <input
+                  type="checkbox"
+                  checked={daysOfWeek.includes(index)}
+                  onChange={(e) => handleDayOfWeekChange(index, e.target.checked)}
+                  style={{ marginRight: '4px' }}
+                />
+                {day}
+              </label>
             ))}
-          </Stack>
-        </FormControl>
+          </div>
+        </div>
       )}
 
       {(repeatType === 'monthly' || repeatType === 'yearly') && (
-        <FormControl fullWidth>
-          <FormLabel>일자</FormLabel>
-          <TextField
-            size="small"
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <label htmlFor="day-of-month">일자</label>
+          <input
+            id="day-of-month"
             type="number"
             value={dayOfMonth}
             onChange={(e) => setDayOfMonth(Number(e.target.value))}
-            slotProps={{ htmlInput: { min: 1, max: 31 } }}
+            min={1}
+            max={31}
+            style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
           />
-        </FormControl>
+        </div>
       )}
 
       {repeatType === 'yearly' && (
-        <FormControl fullWidth>
-          <FormLabel>월</FormLabel>
-          <Select
-            size="small"
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <label htmlFor="month-of-year">월</label>
+          <select
+            id="month-of-year"
             value={monthOfYear}
             onChange={(e) => setMonthOfYear(Number(e.target.value))}
+            style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
           >
             {Array.from({ length: 12 }, (_, i) => (
-              <MenuItem key={i} value={i}>
+              <option key={i} value={i}>
                 {i + 1}월
-              </MenuItem>
+              </option>
             ))}
-          </Select>
-        </FormControl>
+          </select>
+        </div>
       )}
 
-      <Stack direction="row" spacing={2}>
-        <FormControl fullWidth>
-          <FormLabel>반복 간격</FormLabel>
-          <TextField
-            size="small"
+      <div style={{ display: 'flex', gap: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+          <label htmlFor="repeat-interval">반복 간격</label>
+          <input
+            id="repeat-interval"
             type="number"
             value={repeatInterval}
             onChange={(e) => setRepeatInterval(Number(e.target.value))}
-            slotProps={{ htmlInput: { min: 1 } }}
+            min={1}
+            style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
           />
-        </FormControl>
-        <FormControl fullWidth>
-          <FormLabel>반복 종료일</FormLabel>
-          <TextField
-            size="small"
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+          <label htmlFor="repeat-end-date">반복 종료일</label>
+          <input
+            id="repeat-end-date"
             type="date"
             value={repeatEndDate}
             onChange={(e) => setRepeatEndDate(e.target.value)}
+            style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
           />
-        </FormControl>
-      </Stack>
-    </Stack>
+        </div>
+      </div>
+    </div>
   );
 };
