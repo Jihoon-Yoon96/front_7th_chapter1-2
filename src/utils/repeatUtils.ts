@@ -113,6 +113,55 @@ export function calculateMonthlyDates(
   return dates;
 }
 
-export function calculateYearlyDates(): string[] {
-  return []; // Placeholder for RED stage
+export function calculateYearlyDates(
+  startDate: string,
+  interval: number,
+  month: number, // 0-indexed
+  dayOfMonth: number,
+  endDate: string
+): string[] {
+  const dates: string[] = [];
+  let current = new Date(startDate + 'T00:00:00');
+  const finalDate = new Date(endDate + 'T00:00:00');
+
+  if (interval <= 0 || dayOfMonth <= 0 || dayOfMonth > 31 || month < 0 || month > 11) {
+    return [];
+  }
+
+  // Find the first valid occurrence on or after startDate
+  let tempDate = new Date(current.getFullYear(), month, dayOfMonth);
+
+  // Adjust tempDate to be on or after startDate and respect month/dayOfMonth.
+  // This loop handles cases where the initial tempDate is before startDate,
+  // or if the month/dayOfMonth combination is invalid for the current year (e.g., Feb 29th in a non-leap year).
+  while (tempDate < current || tempDate.getMonth() !== month || tempDate.getDate() !== dayOfMonth) {
+    tempDate.setFullYear(tempDate.getFullYear() + 1);
+    tempDate.setMonth(month);
+    tempDate.setDate(dayOfMonth);
+  }
+
+  // Adjust tempDate to respect the interval from the original startDate
+  let yearsSinceStart = tempDate.getFullYear() - current.getFullYear();
+  if (yearsSinceStart % interval !== 0) {
+    tempDate.setFullYear(tempDate.getFullYear() + (interval - (yearsSinceStart % interval)));
+    tempDate.setMonth(month);
+    tempDate.setDate(dayOfMonth);
+  }
+
+  // Main loop
+  while (tempDate <= finalDate) {
+    // Check if the dayOfMonth is valid for the current month of tempDate
+    // (e.g., if dayOfMonth is 29, and current month is Feb, tempDate.getDate() will be 1 if not leap year)
+    // We only add if the day is the intended dayOfMonth AND the month is the intended month
+    if (tempDate.getMonth() === month && tempDate.getDate() === dayOfMonth) {
+      dates.push(tempDate.toISOString().split('T')[0]);
+    }
+
+    // Move to the next year based on interval
+    tempDate.setFullYear(tempDate.getFullYear() + interval);
+    tempDate.setMonth(month);
+    tempDate.setDate(dayOfMonth);
+  }
+
+  return dates;
 }
