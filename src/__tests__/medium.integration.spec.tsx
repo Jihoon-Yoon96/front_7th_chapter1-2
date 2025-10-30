@@ -10,6 +10,7 @@ import {
   setupMockHandlerCreation,
   setupMockHandlerDeletion,
   setupMockHandlerUpdating,
+  setupMockGetEvents,
 } from '../__mocks__/handlersUtils';
 import App from '../App';
 import { server } from '../setupTests';
@@ -360,5 +361,45 @@ describe('반복 일정 유형 선택 UI 통합 테스트', () => {
 
     const repeatTypeSelect = screen.getByLabelText('반복 유형');
     expect(repeatTypeSelect).toBeInTheDocument(); // This should fail initially
+  });
+});
+
+// RED 단계: 반복 일정 시각적 표시
+describe('반복 일정 시각적 표시', () => {
+  beforeEach(() => {
+    setupMockGetEvents([
+      {
+        id: '1',
+        title: '반복되는 회의',
+        date: '2025-10-15',
+        startTime: '10:00',
+        endTime: '11:00',
+        category: '업무',
+        repeat: { type: 'daily', interval: 1 },
+      },
+      {
+        id: '2',
+        title: '반복되지 않는 회의',
+        date: '2025-10-16',
+        startTime: '10:00',
+        endTime: '11:00',
+        category: '업무',
+        repeat: { type: 'none', interval: 0 },
+      },
+    ]);
+  });
+
+  it('반복되는 일정에는 반복 아이콘이 표시되어야 한다.', async () => {
+    const { user } = setup(<App />);
+    const recurringEventItem = await screen.findByText('반복되는 회의');
+    const recurringEventContainer = recurringEventItem.closest('li');
+    expect(within(recurringEventContainer!).getByTestId('ReplayIcon')).toBeInTheDocument();
+  });
+
+  it('반복되지 않는 일정에는 반복 아이콘이 표시되지 않아야 한다.', async () => {
+    const { user } = setup(<App />);
+    const nonRecurringEventItem = await screen.findByText('반복되지 않는 회의');
+    const nonRecurringEventContainer = nonRecurringEventItem.closest('li');
+    expect(within(nonRecurringEventContainer!).queryByTestId('ReplayIcon')).not.toBeInTheDocument();
   });
 });
