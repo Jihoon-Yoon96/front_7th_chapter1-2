@@ -365,24 +365,39 @@ describe('반복 일정 유형 선택 UI 통합 테스트', () => {
 });
 
 // RED 단계: 사용자가 반복 일정을 생성하는 시나리오 테스트
+
+const createRecurringEvent = async (
+  user: UserEvent,
+  options: { title: string; date: string; startTime: string; endTime: string; repeatType: 'daily' | 'weekly' | 'monthly' | 'yearly' }
+) => {
+  const { title, date, startTime, endTime, repeatType } = options;
+
+  await user.type(screen.getByLabelText('제목'), title);
+  await user.type(screen.getByLabelText('날짜'), date);
+  await user.type(screen.getByLabelText('시작 시간'), startTime);
+  await user.type(screen.getByLabelText('종료 시간'), endTime);
+  await user.click(screen.getByLabelText('반복 일정'));
+  await user.selectOptions(screen.getByLabelText('반복 유형'), repeatType);
+
+  await user.click(screen.getByTestId('event-submit-button'));
+};
+
 describe('반복 일정 시각적 표시 (사용자 시나리오)', () => {
   it("사용자가 '매일' 반복 일정을 생성하면, 해당 일정 목록에 반복 아이콘이 표시된다", async () => {
-    // 1. [GIVEN] 사용자가 일정 생성 모드에 있고, API는 준비되어 있다.
+    // 1. [GIVEN]
     setupMockHandlerCreation([]);
     const { user } = setup(<App />);
 
-    // 2. [WHEN] 사용자가 반복 일정 정보를 입력하고 제출한다.
-    await user.type(screen.getByLabelText('제목'), '매일 반복 회의');
-    await user.type(screen.getByLabelText('날짜'), '2025-10-15');
-    await user.type(screen.getByLabelText('시작 시간'), '10:00');
-    await user.type(screen.getByLabelText('종료 시간'), '11:00');
-    await user.click(screen.getByLabelText('반복 일정'));
-    // `user.selectOptions`를 사용하여 select 요소의 변경을 안정적으로 트리거
-    await user.selectOptions(screen.getByLabelText('반복 유형'), 'daily');
+    // 2. [WHEN]
+    await createRecurringEvent(user, {
+      title: '매일 반복 회의',
+      date: '2025-10-15',
+      startTime: '10:00',
+      endTime: '11:00',
+      repeatType: 'daily',
+    });
 
-    await user.click(screen.getByTestId('event-submit-button'));
-
-    // 3. [THEN] 생성된 일정 항목에서 반복 아이콘이 발견되어야 한다.
+    // 3. [THEN]
     const eventList = screen.getByTestId('event-list');
     const newEventItem = await within(eventList).findByText('매일 반복 회의');
     const newEventContainer = newEventItem.closest('div');
