@@ -1,5 +1,6 @@
 // src/__tests__/utils/repeatUtils.spec.ts
 import { calculateDailyDates } from '../../utils/repeatUtils';
+import { afterEach } from 'vitest';
 
 describe('calculateDailyDates', () => {
   it('간격이 1일 때 종료일까지 매일 반복되는 날짜를 올바르게 생성해야 한다', () => {
@@ -44,20 +45,42 @@ describe('calculateDailyDates', () => {
 
 
 describe('calculateWeeklyDates', () => {
+  let start = '2025-11-01';
+  let end = '2025-11-07';
+
+  afterEach(()=>{
+    // 공통변수 초기화
+    start = '2025-11-01';
+    end = '2025-11-07';
+})
+
   it('간격이 1이고 특정 요일이 선택되었을 때 매주 반복되는 날짜를 올바르게 생성해야 한다', () => {
     // TODO: 테스트 코드 작성
+    let interval = 1;
+    let result = ['2025-11-01', '2025-11-08']
+    expect(calculateDailyDates(start, interval, end)).toEqual(result)
+
   });
 
   it('간격이 2이고 특정 요일이 선택되었을 때 격주로 반복되는 날짜를 올바르게 생성해야 한다', () => {
     // TODO: 테스트 코드 작성
+    let interval = 2
+    let result = ['2025-11-01', '2025-11-07']
+    expect(calculateDailyDates(start, interval, end)).toEqual(result)
   });
 
   it('간격이 0 이하일 경우 빈 배열을 반환해야 한다', () => {
     // TODO: 테스트 코드 작성
+    let interval = 0
+    let result = []
+    expect(calculateDailyDates(start, interval, end)).toEqual(result)
   });
 
-  it('시작일과 종료일이 같을 때를 처리해야 한다', () => {
+  it('시작일과 종료일이 같으면 빈 배열을 반환해야 한다', () => {
     // TODO: 테스트 코드 작성
+    let interval = 0
+    let result = []
+    expect(calculateDailyDates(start, interval, start)).toEqual(result)
   });
 
   it('종료일을 초과하는 날짜를 생성하지 않아야 한다', () => {
