@@ -13,10 +13,13 @@ export const useEventForm = (initialEvent?: Event) => {
   const [description, setDescription] = useState(initialEvent?.description || '');
   const [location, setLocation] = useState(initialEvent?.location || '');
   const [category, setCategory] = useState(initialEvent?.category || '업무');
-  const [isRepeating, setIsRepeating] = useState(initialEvent?.repeat.type !== 'none');
+  const [isRepeating, setIsRepeating] = useState(initialEvent ? initialEvent.repeat.type !== 'none' : false);
   const [repeatType, setRepeatType] = useState<RepeatType>(initialEvent?.repeat.type || 'none');
   const [repeatInterval, setRepeatInterval] = useState(initialEvent?.repeat.interval || 1);
   const [repeatEndDate, setRepeatEndDate] = useState(initialEvent?.repeat.endDate || '');
+  const [daysOfWeek, setDaysOfWeek] = useState<number[]>(initialEvent?.repeat.daysOfWeek || []);
+  const [dayOfMonth, setDayOfMonth] = useState(initialEvent?.repeat.dayOfMonth || 1);
+  const [monthOfYear, setMonthOfYear] = useState(initialEvent?.repeat.monthOfYear || 0);
   const [notificationTime, setNotificationTime] = useState(initialEvent?.notificationTime || 10);
 
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
@@ -50,6 +53,9 @@ export const useEventForm = (initialEvent?: Event) => {
     setRepeatType('none');
     setRepeatInterval(1);
     setRepeatEndDate('');
+    setDaysOfWeek([]);
+    setDayOfMonth(1);
+    setMonthOfYear(0);
     setNotificationTime(10);
   };
 
@@ -66,6 +72,9 @@ export const useEventForm = (initialEvent?: Event) => {
     setRepeatType(event.repeat.type);
     setRepeatInterval(event.repeat.interval);
     setRepeatEndDate(event.repeat.endDate || '');
+    setDaysOfWeek(event.repeat.daysOfWeek || []);
+    setDayOfMonth(event.repeat.dayOfMonth || 1);
+    setMonthOfYear(event.repeat.monthOfYear || 0);
     setNotificationTime(event.notificationTime);
   };
 
@@ -92,6 +101,12 @@ export const useEventForm = (initialEvent?: Event) => {
     setRepeatInterval,
     repeatEndDate,
     setRepeatEndDate,
+    daysOfWeek,
+    setDaysOfWeek,
+    dayOfMonth,
+    setDayOfMonth,
+    monthOfYear,
+    setMonthOfYear,
     notificationTime,
     setNotificationTime,
     startTimeError,

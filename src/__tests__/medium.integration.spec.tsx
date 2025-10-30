@@ -353,7 +353,7 @@ describe('반복 일정 유형 선택 UI 통합 테스트', () => {
     const { user } = setup(<App />);
 
     const repeatCheckbox = screen.getByLabelText('반복 일정');
-    // expect(repeatCheckbox).not.toBeChecked();
+    expect(repeatCheckbox).not.toBeChecked();
 
     await user.click(repeatCheckbox);
     expect(repeatCheckbox).toBeChecked();

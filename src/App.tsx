@@ -440,18 +440,78 @@ function App() {
           {isRepeating && (
             <Stack spacing={2}>
               <FormControl fullWidth>
-                <FormLabel>반복 유형</FormLabel>
+                <FormLabel id="repeat-type-label">반복 유형</FormLabel>
                 <Select
+                  id="repeat-type" // Keep id for potential other uses
+                  aria-labelledby="repeat-type-label"
                   size="small"
                   value={repeatType}
                   onChange={(e) => setRepeatType(e.target.value as RepeatType)}
                 >
+                  <MenuItem value="none">없음</MenuItem>
                   <MenuItem value="daily">매일</MenuItem>
                   <MenuItem value="weekly">매주</MenuItem>
                   <MenuItem value="monthly">매월</MenuItem>
                   <MenuItem value="yearly">매년</MenuItem>
                 </Select>
               </FormControl>
+
+              {repeatType === 'weekly' && (
+                <FormControl fullWidth>
+                  <FormLabel>요일 선택</FormLabel>
+                  <Stack direction="row" spacing={1}>
+                    {weekDays.map((day, index) => (
+                      <FormControlLabel
+                        key={day}
+                        control={
+                          <Checkbox
+                            checked={daysOfWeek.includes(index)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setDaysOfWeek([...daysOfWeek, index]);
+                              } else {
+                                setDaysOfWeek(daysOfWeek.filter((d) => d !== index));
+                              }
+                            }}
+                          />
+                        }
+                        label={day}
+                      />
+                    ))}
+                  </Stack>
+                </FormControl>
+              )}
+
+              {(repeatType === 'monthly' || repeatType === 'yearly') && (
+                <FormControl fullWidth>
+                  <FormLabel>일자</FormLabel>
+                  <TextField
+                    size="small"
+                    type="number"
+                    value={dayOfMonth}
+                    onChange={(e) => setDayOfMonth(Number(e.target.value))}
+                    slotProps={{ htmlInput: { min: 1, max: 31 } }}
+                  />
+                </FormControl>
+              )}
+
+              {repeatType === 'yearly' && (
+                <FormControl fullWidth>
+                  <FormLabel>월</FormLabel>
+                  <Select
+                    size="small"
+                    value={monthOfYear}
+                    onChange={(e) => setMonthOfYear(Number(e.target.value))}
+                  >
+                    {Array.from({ length: 12 }, (_, i) => (
+                      <MenuItem key={i} value={i}>
+                        {i + 1}월
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+
               <Stack direction="row" spacing={2}>
                 <FormControl fullWidth>
                   <FormLabel>반복 간격</FormLabel>
