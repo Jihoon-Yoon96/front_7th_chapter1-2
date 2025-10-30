@@ -1,4 +1,4 @@
-import { Notifications, ChevronLeft, ChevronRight, Delete, Edit, Close } from '@mui/icons-material';
+import { Notifications, ChevronLeft, ChevronRight, Delete, Edit, Close, Replay as ReplayIcon } from '@mui/icons-material';
 import {
   Alert,
   AlertTitle,
@@ -117,6 +117,7 @@ function App() {
   const { enqueueSnackbar } = useSnackbar();
 
   const addOrUpdateEvent = async () => {
+    console.log('[DEBUG] addOrUpdateEvent state:', { isRepeating, repeatType });
     if (!title || !date || !startTime || !endTime) {
       enqueueSnackbar('필수 정보를 모두 입력해주세요.', { variant: 'error' });
       return;
@@ -526,6 +527,7 @@ function App() {
                 <Stack direction="row" justifyContent="space-between">
                   <Stack>
                     <Stack direction="row" spacing={1} alignItems="center">
+                      {event.repeat.type !== 'none' && <ReplayIcon data-testid="ReplayIcon" />}
                       {notifiedEvents.includes(event.id) && <Notifications color="error" />}
                       <Typography
                         fontWeight={notifiedEvents.includes(event.id) ? 'bold' : 'normal'}
