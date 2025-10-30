@@ -40,6 +40,7 @@
   - **`userEvent` Only:** **`fireEvent.change`는 사용해선 안 됩니다.** `date`, `time` 필드를 포함한 모든 사용자 입력은 `userEvent.type()`으로 처리해야 합니다.
   - **MSW Setup:** `describe` 블록 전체에 공통으로 적용되는 핸들러는 `it` 블록 내부가 아닌 `beforeEach`/`afterEach` (**`src/setupTests.ts`** 또는 `describe` 블록 내)로 관리하는 것이 좋습니다.
   - **Timer Mocks:** 시간과 관련된 테스트는 `vi.setSystemTime`과 `vi.advanceTimersByTime`을 사용해야 합니다.
+  - **Test Scope Refactoring:** 각 테스트 스코프(`describe` 블록) 내에서 공통화할 수 있는 변수 선언, 초기화 등은 `beforeEach`, `afterEach`를 사용하여 직접 리팩토링합니다.
 
 ### 4. [Output Format: The Review & Code Modification]
 *(3. 산출물 (리뷰 및 코드 수정): 'Brian'의 학습을 위한 피드백과 함께, 필요한 코드 수정 사항을 파일에 직접 반영합니다.)*
