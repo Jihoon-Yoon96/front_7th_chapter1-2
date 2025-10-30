@@ -40,8 +40,6 @@ export function calculateWeeklyDates(
   const startOfWeek = new Date(current);
   startOfWeek.setDate(current.getDate() - current.getDay()); // 일요일로 맞춤
 
-  let weekCount = 0;
-
   while (current <= finalDate) {
     const dayOfWeek = current.getDay(); // 0: 일요일, 1: 월요일, ...
 
