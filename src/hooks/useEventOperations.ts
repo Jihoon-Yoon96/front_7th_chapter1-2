@@ -79,5 +79,19 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { events, fetchEvents, saveEvent, deleteEvent };
+  const detachEventFromSeries = async (eventId: string) => {
+    try {
+      const response = await fetch(`/api/events/${eventId}/detach`, { method: 'PUT' });
+      if (!response.ok) {
+        throw new Error('Failed to detach event');
+      }
+      await fetchEvents();
+      enqueueSnackbar('일정이 단일 일정으로 변경되었습니다.', { variant: 'success' });
+    } catch (error) {
+      console.error('Error detaching event:', error);
+      enqueueSnackbar('일정 분리 실패', { variant: 'error' });
+    }
+  };
+
+  return { events, fetchEvents, saveEvent, deleteEvent, detachEventFromSeries };
 };

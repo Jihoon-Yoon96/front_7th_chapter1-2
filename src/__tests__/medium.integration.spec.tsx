@@ -712,7 +712,8 @@ describe('반복 일정 수정 확인 다이얼로그', () => {
     });
 
     // THEN: `PUT /api/events/:id/detach` API가 호출되었고, UI에서 반복 아이콘이 사라졌는지 확인
-    const updatedEventItem = await screen.findByText('반복되는 일정');
+    const eventList = screen.getByTestId('event-list');
+    const updatedEventItem = await within(eventList).findByText('반복되는 일정');
     const updatedEventContainer = updatedEventItem.closest('div');
     expect(within(updatedEventContainer!).queryByTestId('ReplayIcon')).not.toBeInTheDocument();
   });

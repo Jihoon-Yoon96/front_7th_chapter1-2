@@ -103,7 +103,7 @@ function App() {
     editEvent,
   } = useEventForm();
 
-  const { events, saveEvent, deleteEvent } = useEventOperations(Boolean(editingEvent), () =>
+  const { events, saveEvent, deleteEvent, detachEventFromSeries } = useEventOperations(Boolean(editingEvent), () =>
     setEditingEvent(null)
   );
 
@@ -664,9 +664,10 @@ function App() {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => {
+          <Button onClick={async () => {
             // '예' (단일 수정) 로직
             if (editingSeriesEvent) {
+              await detachEventFromSeries(editingSeriesEvent.id);
               editEvent(editingSeriesEvent, undefined); // 폼에 이벤트 정보 채우기
             }
             setEditingSeriesEvent(null);
