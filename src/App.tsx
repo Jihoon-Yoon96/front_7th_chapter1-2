@@ -139,11 +139,11 @@ function App() {
       category,
       repeat: {
         type: isRepeating ? repeatType : 'none',
-        interval: repeatInterval,
-        endDate: repeatEndDate || undefined,
-        daysOfWeek: repeatType === 'weekly' ? daysOfWeek : undefined,
-        dayOfMonth: (repeatType === 'monthly' || repeatType === 'yearly') ? dayOfMonth : undefined,
-        monthOfYear: repeatType === 'yearly' ? monthOfYear : undefined,
+        interval: isRepeating ? repeatInterval : 0,
+        endDate: isRepeating ? (repeatEndDate || undefined) : undefined,
+        daysOfWeek: isRepeating && repeatType === 'weekly' ? daysOfWeek : undefined,
+        dayOfMonth: isRepeating && (repeatType === 'monthly' || repeatType === 'yearly') ? dayOfMonth : undefined,
+        monthOfYear: isRepeating && repeatType === 'yearly' ? monthOfYear : undefined,
       },
       notificationTime,
     };

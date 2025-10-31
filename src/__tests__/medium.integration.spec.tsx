@@ -577,8 +577,13 @@ describe('반복 종료일 저장', () => {
     await user.type(screen.getByLabelText('날짜'), '2025-10-01');
     await user.type(screen.getByLabelText('시작 시간'), '10:00');
     await user.type(screen.getByLabelText('종료 시간'), '11:00');
-    // '반복 일정' 체크박스를 클릭하지 않음 (isRepeating: false)
-    await user.type(screen.getByLabelText('반복 종료일'), endDateToSubmit); // 종료일은 입력하지만, 반복은 아님
+    
+    // 사용자가 반복을 설정했다가 다시 취소하는 흐름
+    const repeatCheckbox = screen.getByLabelText('반복 일정');
+    await user.click(repeatCheckbox); // 1. 반복 체크
+    await user.type(await screen.findByLabelText('반복 종료일'), endDateToSubmit); // 2. 종료일 입력
+    await user.click(repeatCheckbox); // 3. 반복 체크 해제
+
     await user.click(screen.getByTestId('event-submit-button'));
 
     // THEN
