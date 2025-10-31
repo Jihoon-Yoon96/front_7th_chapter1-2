@@ -197,4 +197,27 @@ describe('expandRecurringEvents', () => {
     expect(result).toEqual(expect.arrayContaining(expected));
     expect(result.length).toBe(expected.length);
   });
+
+  it('매년 반복되는 이벤트를 주어진 기간에 맞게 올바르게 확장해야 한다', () => {
+    const yearlyEvent = {
+      id: '4',
+      title: '연간 행사',
+      date: '2024-02-29', // 윤년
+      startTime: '09:00',
+      endTime: '18:00',
+      repeat: { type: 'yearly', interval: 1, monthOfYear: 1, dayOfMonth: 29, endDate: '2028-02-29' },
+    };
+    const events = [yearlyEvent];
+    const rangeStart = new Date('2024-01-01');
+    const rangeEnd = new Date('2028-12-31');
+
+    const expected = [
+      { ...yearlyEvent, date: '2024-02-29' },
+      { ...yearlyEvent, date: '2028-02-29' },
+    ];
+
+    const result = expandRecurringEvents(events, rangeStart, rangeEnd);
+    expect(result).toEqual(expect.arrayContaining(expected));
+    expect(result.length).toBe(expected.length);
+  });
 });
