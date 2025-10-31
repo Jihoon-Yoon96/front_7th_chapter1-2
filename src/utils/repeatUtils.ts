@@ -5,6 +5,42 @@
  * @param endDate 종료일 (YYYY-MM-DD)
  * @returns 날짜 문자열 배열 (YYYY-MM-DD)
  */
+
+import { Event } from '../types';
+
+export function expandRecurringEvents(events: Event[], rangeStart: Date, rangeEnd: Date): Event[] {
+  const occurrences: Event[] = [];
+
+  events.forEach(event => {
+    switch (event.repeat.type) {
+      case 'none': {
+        const eventDate = new Date(event.date);
+        if (eventDate >= rangeStart && eventDate <= rangeEnd) {
+          occurrences.push(event);
+        }
+        break;
+      }
+      case 'daily': {
+        const repeatEndDate = event.repeat.endDate || new Date(rangeEnd).toISOString().split('T')[0];
+        const dates = calculateDailyDates(event.date, event.repeat.interval, repeatEndDate);
+
+        dates.forEach(date => {
+          const occurrenceDate = new Date(date);
+          if (occurrenceDate >= rangeStart && occurrenceDate <= rangeEnd) {
+            occurrences.push({ ...event, date });
+          }
+        });
+        break;
+      }
+      // TODO: weekly, monthly, yearly 케이스 추가 예정
+      default:
+        break;
+    }
+  });
+
+  return occurrences;
+}
+
 export function calculateDailyDates(startDate: string, interval: number, endDate: string): string[] {
   const dates: string[] = [];
   let currentDate = new Date(startDate + 'T00:00:00'); // 시간 정보 추가하여 정확성 확보
