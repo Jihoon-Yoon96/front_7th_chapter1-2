@@ -486,4 +486,24 @@ describe('반복 일정 확장 표시 (통합)', () => {
     const eventTitles = await within(weekView).findAllByText('주간 월요일 회의');
     expect(eventTitles).toHaveLength(1); // 해당 주 월요일에 1번
   });
+
+  it('매월 반복되는 일정은 월별 뷰의 해당 일자에 걸쳐 표시되어야 한다', async () => {
+    // GIVEN: '매월' 15일에 반복되는 일정이 생성된 상태
+    setupMockHandlerCreation([]);
+    const { user } = setup(<App />);
+    await createRecurringEvent(user, {
+      title: '월간 15일 회의',
+      date: '2025-10-15', // 10월 15일
+      startTime: '14:00',
+      endTime: '15:00',
+      repeatType: 'monthly', // 매월 반복
+      dayOfMonth: 15,
+    });
+
+    // WHEN: 월별 뷰로 전환 (기본 뷰가 월별이므로 별도 전환 필요 없음)
+    // THEN: 해당 월의 15일에 이벤트가 표시되어야 함
+    const monthView = screen.getByTestId('month-view');
+    const eventTitles = await within(monthView).findAllByText('월간 15일 회의');
+    expect(eventTitles).toHaveLength(1); // 해당 월 15일에 1번
+  });
 });
