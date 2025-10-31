@@ -173,4 +173,28 @@ describe('expandRecurringEvents', () => {
     expect(result).toEqual(expect.arrayContaining(expected));
     expect(result.length).toBe(expected.length);
   });
+
+  it('매월 반복되는 이벤트를 주어진 기간에 맞게 올바르게 확장해야 한다', () => {
+    const monthlyEvent = {
+      id: '3',
+      title: '월간 보고',
+      date: '2025-01-15',
+      startTime: '14:00',
+      endTime: '15:00',
+      repeat: { type: 'monthly', interval: 1, dayOfMonth: 15, endDate: '2025-03-15' },
+    };
+    const events = [monthlyEvent];
+    const rangeStart = new Date('2025-01-01');
+    const rangeEnd = new Date('2025-03-31');
+
+    const expected = [
+      { ...monthlyEvent, date: '2025-01-15' },
+      { ...monthlyEvent, date: '2025-02-15' },
+      { ...monthlyEvent, date: '2025-03-15' },
+    ];
+
+    const result = expandRecurringEvents(events, rangeStart, rangeEnd);
+    expect(result).toEqual(expect.arrayContaining(expected));
+    expect(result.length).toBe(expected.length);
+  });
 });
