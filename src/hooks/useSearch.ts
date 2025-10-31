@@ -22,9 +22,18 @@ export const useSearch = (events: Event[], currentDate: Date, view: 'week' | 'mo
       const weekDates = getWeekDates(currentDate);
       rangeStart = weekDates[0];
       rangeEnd = weekDates[6];
-    } else { // month view
+    } else {
+      // month view
       rangeStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-      rangeEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59, 999);
+      rangeEnd = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() + 1,
+        0,
+        23,
+        59,
+        59,
+        999
+      );
     }
 
     return expandRecurringEvents(listEvents, rangeStart, rangeEnd);

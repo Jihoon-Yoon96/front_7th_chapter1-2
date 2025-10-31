@@ -1,4 +1,12 @@
-import { Notifications, ChevronLeft, ChevronRight, Delete, Edit, Close, Replay as ReplayIcon } from '@mui/icons-material';
+import {
+  Notifications,
+  ChevronLeft,
+  ChevronRight,
+  Delete,
+  Edit,
+  Close,
+  Replay as ReplayIcon,
+} from '@mui/icons-material';
 import {
   Alert,
   AlertTitle,
@@ -30,6 +38,7 @@ import {
 import { useSnackbar } from 'notistack';
 import { useState } from 'react';
 
+import { RepeatOptions } from './components/RepeatOptions.tsx'; // New import
 import { useCalendarView } from './hooks/useCalendarView.ts';
 import { useEventForm } from './hooks/useEventForm.ts';
 import { useEventOperations } from './hooks/useEventOperations.ts';
@@ -37,7 +46,6 @@ import { useNotifications } from './hooks/useNotifications.ts';
 import { useSearch } from './hooks/useSearch.ts';
 // import { Event, EventForm, RepeatType } from './types';
 import { Event, EventForm } from './types';
-import { RepeatOptions } from './components/RepeatOptions.tsx'; // New import
 import {
   formatDate,
   formatMonth,
@@ -52,8 +60,6 @@ import { getTimeErrorMessage } from './utils/timeValidation';
 const categories = ['업무', '개인', '가족', '기타'];
 
 const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
-
-
 
 const notificationOptions = [
   { value: 1, label: '1분 전' },
@@ -103,13 +109,18 @@ function App() {
     editEvent,
   } = useEventForm();
 
-  const { events, saveEvent, deleteEvent, detachEventFromSeries } = useEventOperations(Boolean(editingEvent), () =>
-    setEditingEvent(null)
+  const { events, saveEvent, deleteEvent, detachEventFromSeries } = useEventOperations(
+    Boolean(editingEvent),
+    () => setEditingEvent(null)
   );
 
   const { notifications, notifiedEvents, setNotifications } = useNotifications(events);
   const { view, setView, currentDate, holidays, navigate } = useCalendarView();
-  const { searchTerm, listEvents, calendarEvents, setSearchTerm } = useSearch(events, currentDate, view);
+  const { searchTerm, listEvents, calendarEvents, setSearchTerm } = useSearch(
+    events,
+    currentDate,
+    view
+  );
 
   const [isOverlapDialogOpen, setIsOverlapDialogOpen] = useState(false);
   const [overlappingEvents, setOverlappingEvents] = useState<Event[]>([]);
@@ -146,9 +157,12 @@ function App() {
       repeat: {
         type: isRepeating ? repeatType : 'none',
         interval: isRepeating ? repeatInterval : 0,
-        endDate: isRepeating ? (repeatEndDate || undefined) : undefined,
+        endDate: isRepeating ? repeatEndDate || undefined : undefined,
         daysOfWeek: isRepeating && repeatType === 'weekly' ? daysOfWeek : undefined,
-        dayOfMonth: isRepeating && (repeatType === 'monthly' || repeatType === 'yearly') ? dayOfMonth : undefined,
+        dayOfMonth:
+          isRepeating && (repeatType === 'monthly' || repeatType === 'yearly')
+            ? dayOfMonth
+            : undefined,
         monthOfYear: isRepeating && repeatType === 'yearly' ? monthOfYear : undefined,
       },
       notificationTime,
@@ -532,7 +546,10 @@ function App() {
             <Typography>검색 결과가 없습니다.</Typography>
           ) : (
             listEvents.map((event) => (
-              <Box key={`${event.id}-${event.date}`} sx={{ border: 1, borderRadius: 2, p: 3, width: '100%' }}>
+              <Box
+                key={`${event.id}-${event.date}`}
+                sx={{ border: 1, borderRadius: 2, p: 3, width: '100%' }}
+              >
                 <Stack direction="row" justifyContent="space-between">
                   <Stack>
                     <Stack direction="row" spacing={1} alignItems="center">
@@ -573,10 +590,16 @@ function App() {
                     </Typography>
                   </Stack>
                   <Stack>
-                    <IconButton aria-label={`Edit event ${event.title}`} onClick={() => editEvent(event, handleEditRecurringEvent)}>
+                    <IconButton
+                      aria-label={`Edit event ${event.title}`}
+                      onClick={() => editEvent(event, handleEditRecurringEvent)}
+                    >
                       <Edit />
                     </IconButton>
-                    <IconButton aria-label={`Delete event ${event.title}`} onClick={() => deleteEvent(event.id)}>
+                    <IconButton
+                      aria-label={`Delete event ${event.title}`}
+                      onClick={() => deleteEvent(event.id)}
+                    >
                       <Delete />
                     </IconButton>
                   </Stack>
@@ -659,24 +682,30 @@ function App() {
       >
         <DialogTitle id="edit-recurring-event-dialog-title">일정 수정 확인</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            해당 일정만 수정하시겠어요?
-          </DialogContentText>
+          <DialogContentText>해당 일정만 수정하시겠어요?</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={async () => {
-            // '예' (단일 수정) 로직
-            if (editingSeriesEvent) {
-              await detachEventFromSeries(editingSeriesEvent.id);
-              editEvent(editingSeriesEvent, undefined); // 폼에 이벤트 정보 채우기
-            }
-            setEditingSeriesEvent(null);
-          }}>예</Button>
-          <Button onClick={() => {
-            // '아니오' (전체 수정) 로직
-            // TODO: 전체 수정 로직 구현
-            setEditingSeriesEvent(null);
-          }}>아니오</Button>
+          <Button
+            onClick={async () => {
+              // '예' (단일 수정) 로직
+              if (editingSeriesEvent) {
+                await detachEventFromSeries(editingSeriesEvent.id);
+                editEvent(editingSeriesEvent, undefined); // 폼에 이벤트 정보 채우기
+              }
+              setEditingSeriesEvent(null);
+            }}
+          >
+            예
+          </Button>
+          <Button
+            onClick={() => {
+              // '아니오' (전체 수정) 로직
+              // TODO: 전체 수정 로직 구현
+              setEditingSeriesEvent(null);
+            }}
+          >
+            아니오
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

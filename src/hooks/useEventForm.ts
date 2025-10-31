@@ -13,7 +13,9 @@ export const useEventForm = (initialEvent?: Event) => {
   const [description, setDescription] = useState(initialEvent?.description || '');
   const [location, setLocation] = useState(initialEvent?.location || '');
   const [category, setCategory] = useState(initialEvent?.category || '업무');
-  const [isRepeating, setIsRepeating] = useState(initialEvent ? initialEvent.repeat.type !== 'none' : false);
+  const [isRepeating, setIsRepeating] = useState(
+    initialEvent ? initialEvent.repeat.type !== 'none' : false
+  );
   const [repeatType, setRepeatType] = useState<RepeatType>(initialEvent?.repeat.type || 'none');
   const [repeatInterval, setRepeatInterval] = useState(initialEvent?.repeat.interval || 1);
   const [repeatEndDate, setRepeatEndDate] = useState(initialEvent?.repeat.endDate || '');
@@ -59,26 +61,26 @@ export const useEventForm = (initialEvent?: Event) => {
     setNotificationTime(10);
   };
 
-  const editEvent = (event: Event, onEditRecurringEvent?: (event: Event) => void) => {
-    setEditingEvent(event);
-    setTitle(event.title);
-    setDate(event.date);
-    setStartTime(event.startTime);
-    setEndTime(event.endTime);
-    setDescription(event.description);
-    setLocation(event.location);
-    setCategory(event.category);
-    setIsRepeating(event.repeat.type !== 'none');
-    setRepeatType(event.repeat.type);
-    setRepeatInterval(event.repeat.interval);
-    setRepeatEndDate(event.repeat.endDate || '');
-    setDaysOfWeek(event.repeat.daysOfWeek || []);
-    setDayOfMonth(event.repeat.dayOfMonth || 1);
-    setMonthOfYear(event.repeat.monthOfYear || 0);
-    setNotificationTime(event.notificationTime);
+  const editEvent = (_event: Event, onEditRecurringEvent?: (event: Event) => void) => {
+    setEditingEvent(_event);
+    setTitle(_event.title);
+    setDate(_event.date);
+    setStartTime(_event.startTime);
+    setEndTime(_event.endTime);
+    setDescription(_event.description);
+    setLocation(_event.location);
+    setCategory(_event.category);
+    setIsRepeating(_event.repeat.type !== 'none');
+    setRepeatType(_event.repeat.type);
+    setRepeatInterval(_event.repeat.interval);
+    setRepeatEndDate(_event.repeat.endDate || '');
+    setDaysOfWeek(_event.repeat.daysOfWeek || []);
+    setDayOfMonth(_event.repeat.dayOfMonth || 1);
+    setMonthOfYear(_event.repeat.monthOfYear || 0);
+    setNotificationTime(_event.notificationTime);
 
-    if (event.repeat.type !== 'none' && onEditRecurringEvent) {
-      onEditRecurringEvent(event);
+    if (_event.repeat.type !== 'none' && onEditRecurringEvent) {
+      onEditRecurringEvent(_event);
     }
   };
 

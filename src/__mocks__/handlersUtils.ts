@@ -110,12 +110,12 @@ export const setupMockGetEvents = (mockEvents: Event[]) => {
   );
 };
 
-export const setupMockPostRequestHandler = (onPost: (body: any) => void) => {
+export const setupMockPostRequestHandler = (onPost: (body: Event) => void) => {
   server.use(
     http.post('/api/events', async ({ request }) => {
-      const requestBody = await request.json();
-      onPost(requestBody);
-      return HttpResponse.json(requestBody, { status: 201 });
+      const _requestBody = await request.json();
+      onPost(_requestBody);
+      return HttpResponse.json(_requestBody, { status: 201 });
     }),
     http.get('/api/events', () => {
       return HttpResponse.json({ events: [] });

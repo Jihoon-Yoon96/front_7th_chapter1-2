@@ -1,6 +1,6 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { render, screen, within, act, waitFor } from '@testing-library/react';
+import { render, screen, within, act } from '@testing-library/react';
 import { UserEvent, userEvent } from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { SnackbarProvider } from 'notistack';
@@ -359,7 +359,7 @@ describe('반복 일정 유형 선택 UI 통합 테스트', () => {
   //   render(<App />);
   // });
 
-  it('일정 생성/수정 폼에서 \'반복\' 체크박스 선택 시 반복 주기 입력 영역이 노출되어야 한다', async () => {
+  it("일정 생성/수정 폼에서 '반복' 체크박스 선택 시 반복 주기 입력 영역이 노출되어야 한다", async () => {
     setupMockHandlerCreation([]);
     const { user } = setup(<App />);
 
@@ -378,9 +378,19 @@ describe('반복 일정 유형 선택 UI 통합 테스트', () => {
 
 const createRecurringEvent = async (
   user: UserEvent,
-  options: { title: string; date: string; startTime: string; endTime: string; repeatType: 'daily' | 'weekly' | 'monthly' | 'yearly'; daysOfWeek?: number[]; dayOfMonth?: number; monthOfYear?: number }
+  options: {
+    title: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    repeatType: 'daily' | 'weekly' | 'monthly' | 'yearly';
+    daysOfWeek?: number[];
+    dayOfMonth?: number;
+    monthOfYear?: number;
+  }
 ) => {
-  const { title, date, startTime, endTime, repeatType, daysOfWeek, dayOfMonth, monthOfYear } = options;
+  const { title, date, startTime, endTime, repeatType, daysOfWeek, dayOfMonth, monthOfYear } =
+    options;
 
   await user.type(screen.getByLabelText('제목'), title);
   await user.type(screen.getByLabelText('날짜'), date);
@@ -438,7 +448,7 @@ describe('반복 일정 시각적 표시 (사용자 시나리오)', () => {
 describe('반복 종료일 저장', () => {
   it('사용자가 입력한 반복 종료일이 API 요청에 올바르게 포함되어야 한다.', async () => {
     // GIVEN
-    let requestBody: any;
+    let requestBody: Event;
     setupMockPostRequestHandler((body) => {
       requestBody = body;
     });
@@ -548,11 +558,11 @@ describe('반복 일정 확장 표시 (통합)', () => {
   });
 });
 
-// Story 7 - 반복 종료일 저장
-describe('반복 종료일 저장', () => {
+// Story 7 - 반복 종료일 저장 (비반복 시나리오)
+describe('반복 종료일 저장 (비반복 시나리오)', () => {
   it('사용자가 입력한 반복 종료일이 API 요청에 올바르게 포함되어야 한다.', async () => {
     // GIVEN
-    let requestBody: any;
+    let requestBody: unknown;
     setupMockPostRequestHandler((body) => {
       requestBody = body;
     });
@@ -569,12 +579,12 @@ describe('반복 종료일 저장', () => {
     await user.click(screen.getByTestId('event-submit-button'));
 
     // THEN
-    expect(requestBody.repeat.endDate).toBe(endDateToSubmit);
+    expect((requestBody as Event).repeat.endDate).toBe(endDateToSubmit);
   });
 
   it('반복 일정이 아닐 경우, repeat.endDate는 API 요청에 포함되지 않아야 한다', async () => {
     // GIVEN
-    let requestBody: any;
+    let requestBody: unknown;
     setupMockPostRequestHandler((body) => {
       requestBody = body;
     });
@@ -586,7 +596,7 @@ describe('반복 종료일 저장', () => {
     await user.type(screen.getByLabelText('날짜'), '2025-10-01');
     await user.type(screen.getByLabelText('시작 시간'), '10:00');
     await user.type(screen.getByLabelText('종료 시간'), '11:00');
-    
+
     // 사용자가 반복을 설정했다가 다시 취소하는 흐름
     const repeatCheckbox = screen.getByLabelText('반복 일정');
     await user.click(repeatCheckbox); // 1. 반복 체크
@@ -596,10 +606,9 @@ describe('반복 종료일 저장', () => {
     await user.click(screen.getByTestId('event-submit-button'));
 
     // THEN
-    expect(requestBody.repeat.endDate).toBeUndefined();
+    expect((requestBody as Event).repeat.endDate).toBeUndefined();
   });
 });
-
 // RED 단계: Story 8 - 반복 일정 수정 확인 다이얼로그 표시
 describe('반복 일정 수정 확인 다이얼로그', () => {
   beforeEach(() => {
@@ -635,7 +644,9 @@ describe('반복 일정 수정 확인 다이얼로그', () => {
     const { user } = setup(<App />);
 
     // 일반 일정의 수정 버튼 클릭
-    const nonRecurringEditButton = await screen.findByRole('button', { name: 'Edit event 반복되지 않는 일정' });
+    const nonRecurringEditButton = await screen.findByRole('button', {
+      name: 'Edit event 반복되지 않는 일정',
+    });
     await user.click(nonRecurringEditButton);
 
     // 다이얼로그가 나타나지 않음을 확인
@@ -648,7 +659,9 @@ describe('반복 일정 수정 확인 다이얼로그', () => {
     const { user } = setup(<App />);
 
     // 반복 일정의 수정 버튼 클릭
-    const recurringEditButton = await screen.findByRole('button', { name: 'Edit event 반복되는 일정' });
+    const recurringEditButton = await screen.findByRole('button', {
+      name: 'Edit event 반복되는 일정',
+    });
     await user.click(recurringEditButton);
 
     // Fake Timers 환경에서 user-event로 인한 상태 업데이트를 수동으로 실행
@@ -663,7 +676,7 @@ describe('반복 일정 수정 확인 다이얼로그', () => {
     expect(within(dialog).getByRole('button', { name: '아니오' })).toBeInTheDocument();
   });
 
-  it('반복 일정 수정 다이얼로그에서 \'예\' 버튼 클릭 시, 해당 이벤트가 단일 일정으로 분리되어야 한다', async () => {
+  it("반복 일정 수정 다이얼로그에서 '예' 버튼 클릭 시, 해당 이벤트가 단일 일정으로 분리되어야 한다", async () => {
     // GIVEN: seriesId를 가진 반복 이벤트가 존재
     const mockEvents = [
       {
@@ -698,7 +711,9 @@ describe('반복 일정 수정 확인 다이얼로그', () => {
     const { user } = setup(<App />);
 
     // WHEN: 반복 일정의 수정 버튼 클릭 후 다이얼로그에서 '예' 버튼 클릭
-    const recurringEditButton = await screen.findByRole('button', { name: 'Edit event 반복되는 일정' });
+    const recurringEditButton = await screen.findByRole('button', {
+      name: 'Edit event 반복되는 일정',
+    });
     await user.click(recurringEditButton);
     act(() => {
       vi.runOnlyPendingTimers();

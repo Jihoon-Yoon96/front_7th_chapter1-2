@@ -1,6 +1,11 @@
 // src/__tests__/utils/repeatUtils.spec.ts
-import { calculateDailyDates, calculateWeeklyDates, calculateMonthlyDates, calculateYearlyDates, expandRecurringEvents } from '../../utils/repeatUtils';
-import { afterEach } from 'vitest';
+import {
+  calculateDailyDates,
+  calculateWeeklyDates,
+  calculateMonthlyDates,
+  calculateYearlyDates,
+  expandRecurringEvents,
+} from '../../utils/repeatUtils';
 
 describe('calculateDailyDates', () => {
   it('간격이 1일 때 종료일까지 매일 반복되는 날짜를 올바르게 생성해야 한다', () => {
@@ -120,7 +125,9 @@ describe('calculateYearlyDates', () => {
     const month = 0; // January (0-indexed)
     const dayOfMonth = 15;
     const expectedDates = ['2025-01-15', '2026-01-15', '2027-01-15'];
-    expect(calculateYearlyDates(startDate, interval, month, dayOfMonth, endDate)).toEqual(expectedDates);
+    expect(calculateYearlyDates(startDate, interval, month, dayOfMonth, endDate)).toEqual(
+      expectedDates
+    );
   });
 });
 
@@ -205,7 +212,13 @@ describe('expandRecurringEvents', () => {
       date: '2024-02-29', // 윤년
       startTime: '09:00',
       endTime: '18:00',
-      repeat: { type: 'yearly', interval: 1, monthOfYear: 1, dayOfMonth: 29, endDate: '2028-02-29' },
+      repeat: {
+        type: 'yearly',
+        interval: 1,
+        monthOfYear: 1,
+        dayOfMonth: 29,
+        endDate: '2028-02-29',
+      },
     };
     const events = [yearlyEvent];
     const rangeStart = new Date('2024-01-01');
@@ -228,7 +241,13 @@ describe('expandRecurringEvents', () => {
       date: '2024-02-29', // 윤년 시작일
       startTime: '10:00',
       endTime: '11:00',
-      repeat: { type: 'yearly', interval: 1, monthOfYear: 1, dayOfMonth: 29, endDate: '2028-02-29' },
+      repeat: {
+        type: 'yearly',
+        interval: 1,
+        monthOfYear: 1,
+        dayOfMonth: 29,
+        endDate: '2028-02-29',
+      },
     };
     const events = [leapYearEvent];
     const rangeStart = new Date('2024-01-01');

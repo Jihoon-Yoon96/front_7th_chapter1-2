@@ -11,7 +11,7 @@ import { Event } from '../types';
 export function expandRecurringEvents(events: Event[], rangeStart: Date, rangeEnd: Date): Event[] {
   const occurrences: Event[] = [];
 
-  events.forEach(event => {
+  events.forEach((event) => {
     switch (event.repeat.type) {
       case 'none': {
         const eventDate = new Date(event.date);
@@ -21,10 +21,11 @@ export function expandRecurringEvents(events: Event[], rangeStart: Date, rangeEn
         break;
       }
       case 'daily': {
-        const repeatEndDate = event.repeat.endDate || new Date(rangeEnd).toISOString().split('T')[0];
+        const repeatEndDate =
+          event.repeat.endDate || new Date(rangeEnd).toISOString().split('T')[0];
         const dates = calculateDailyDates(event.date, event.repeat.interval, repeatEndDate);
 
-        dates.forEach(date => {
+        dates.forEach((date) => {
           const occurrenceDate = new Date(date);
           if (occurrenceDate >= rangeStart && occurrenceDate <= rangeEnd) {
             occurrences.push({ ...event, date });
@@ -34,10 +35,16 @@ export function expandRecurringEvents(events: Event[], rangeStart: Date, rangeEn
       }
       case 'weekly': {
         if (!event.repeat.daysOfWeek) break; // 요일 정보가 없으면 처리하지 않음
-        const repeatEndDate = event.repeat.endDate || new Date(rangeEnd).toISOString().split('T')[0];
-        const dates = calculateWeeklyDates(event.date, event.repeat.interval, event.repeat.daysOfWeek, repeatEndDate);
+        const repeatEndDate =
+          event.repeat.endDate || new Date(rangeEnd).toISOString().split('T')[0];
+        const dates = calculateWeeklyDates(
+          event.date,
+          event.repeat.interval,
+          event.repeat.daysOfWeek,
+          repeatEndDate
+        );
 
-        dates.forEach(date => {
+        dates.forEach((date) => {
           const occurrenceDate = new Date(date);
           if (occurrenceDate >= rangeStart && occurrenceDate <= rangeEnd) {
             occurrences.push({ ...event, date });
@@ -47,10 +54,16 @@ export function expandRecurringEvents(events: Event[], rangeStart: Date, rangeEn
       }
       case 'monthly': {
         if (!event.repeat.dayOfMonth) break; // 일자 정보가 없으면 처리하지 않음
-        const repeatEndDate = event.repeat.endDate || new Date(rangeEnd).toISOString().split('T')[0];
-        const dates = calculateMonthlyDates(event.date, event.repeat.interval, event.repeat.dayOfMonth, repeatEndDate);
+        const repeatEndDate =
+          event.repeat.endDate || new Date(rangeEnd).toISOString().split('T')[0];
+        const dates = calculateMonthlyDates(
+          event.date,
+          event.repeat.interval,
+          event.repeat.dayOfMonth,
+          repeatEndDate
+        );
 
-        dates.forEach(date => {
+        dates.forEach((date) => {
           const occurrenceDate = new Date(date);
           if (occurrenceDate >= rangeStart && occurrenceDate <= rangeEnd) {
             occurrences.push({ ...event, date });
@@ -60,10 +73,17 @@ export function expandRecurringEvents(events: Event[], rangeStart: Date, rangeEn
       }
       case 'yearly': {
         if (event.repeat.monthOfYear === undefined || event.repeat.dayOfMonth === undefined) break; // 월, 일자 정보가 없으면 처리하지 않음
-        const repeatEndDate = event.repeat.endDate || new Date(rangeEnd).toISOString().split('T')[0];
-        const dates = calculateYearlyDates(event.date, event.repeat.interval, event.repeat.monthOfYear, event.repeat.dayOfMonth, repeatEndDate);
+        const repeatEndDate =
+          event.repeat.endDate || new Date(rangeEnd).toISOString().split('T')[0];
+        const dates = calculateYearlyDates(
+          event.date,
+          event.repeat.interval,
+          event.repeat.monthOfYear,
+          event.repeat.dayOfMonth,
+          repeatEndDate
+        );
 
-        dates.forEach(date => {
+        dates.forEach((date) => {
           const occurrenceDate = new Date(date);
           if (occurrenceDate >= rangeStart && occurrenceDate <= rangeEnd) {
             occurrences.push({ ...event, date });
@@ -79,12 +99,17 @@ export function expandRecurringEvents(events: Event[], rangeStart: Date, rangeEn
   return occurrences;
 }
 
-export function calculateDailyDates(startDate: string, interval: number, endDate: string): string[] {
+export function calculateDailyDates(
+  startDate: string,
+  interval: number,
+  endDate: string
+): string[] {
   const dates: string[] = [];
   let currentDate = new Date(startDate + 'T00:00:00'); // 시간 정보 추가하여 정확성 확보
   const finalDate = new Date(endDate + 'T00:00:00');
 
-  if (interval <= 0) { // 방어 코드 추가
+  if (interval <= 0) {
+    // 방어 코드 추가
     return [];
   }
 
@@ -161,12 +186,13 @@ export function calculateMonthlyDates(
 
   // interval을 고려하여 tempDate를 조정합니다.
   // (예: 1월 15일 시작, interval 3개월, dayOfMonth 15일 -> 첫 발생은 1월 15일이 아니라 4월 15일)
-  let monthsSinceStart = (tempDate.getFullYear() - current.getFullYear()) * 12 + (tempDate.getMonth() - current.getMonth());
+  let monthsSinceStart =
+    (tempDate.getFullYear() - current.getFullYear()) * 12 +
+    (tempDate.getMonth() - current.getMonth());
   if (monthsSinceStart % interval !== 0) {
     tempDate.setMonth(tempDate.getMonth() + (interval - (monthsSinceStart % interval)));
     tempDate.setDate(dayOfMonth);
   }
-
 
   // 메인 루프
   while (tempDate <= finalDate) {
@@ -174,7 +200,8 @@ export function calculateMonthlyDates(
     // Date 객체는 유효하지 않은 날짜를 자동으로 다음 달로 넘기므로,
     // dayOfMonth를 설정한 후 다시 getDate()를 했을 때 dayOfMonth와 다르면 유효하지 않은 날짜임.
     const checkDate = new Date(tempDate.getFullYear(), tempDate.getMonth(), dayOfMonth);
-    if (checkDate.getDate() === dayOfMonth) { // dayOfMonth가 해당 월에 유효한 경우
+    if (checkDate.getDate() === dayOfMonth) {
+      // dayOfMonth가 해당 월에 유효한 경우
       dates.push(checkDate.toISOString().split('T')[0]);
     }
 

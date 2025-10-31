@@ -2,17 +2,17 @@ import { RepeatType } from '../types';
 
 interface RepeatOptionsProps {
   repeatType: RepeatType;
-  setRepeatType: (type: RepeatType) => void;
+  setRepeatType: (_type: RepeatType) => void;
   repeatInterval: number;
-  setRepeatInterval: (interval: number) => void;
+  setRepeatInterval: (_interval: number) => void;
   repeatEndDate: string;
-  setRepeatEndDate: (date: string) => void;
+  setRepeatEndDate: (_date: string) => void;
   daysOfWeek: number[];
-  setDaysOfWeek: (days: number[]) => void;
+  setDaysOfWeek: (_days: number[]) => void;
   dayOfMonth: number;
-  setDayOfMonth: (day: number) => void;
+  setDayOfMonth: (_day: number) => void;
   monthOfYear: number;
-  setMonthOfYear: (month: number) => void;
+  setMonthOfYear: (_month: number) => void;
 }
 
 const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
@@ -42,7 +42,9 @@ export const RepeatOptions = ({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <label htmlFor="repeat-type" id="repeat-type-label">반복 유형</label>
+        <label htmlFor="repeat-type" id="repeat-type-label">
+          반복 유형
+        </label>
         <select
           id="repeat-type"
           aria-labelledby="repeat-type-label"
