@@ -662,4 +662,58 @@ describe('반복 일정 수정 확인 다이얼로그', () => {
     expect(within(dialog).getByRole('button', { name: '예' })).toBeInTheDocument();
     expect(within(dialog).getByRole('button', { name: '아니오' })).toBeInTheDocument();
   });
+
+  it('반복 일정 수정 다이얼로그에서 \'예\' 버튼 클릭 시, 해당 이벤트가 단일 일정으로 분리되어야 한다', async () => {
+    // GIVEN: seriesId를 가진 반복 이벤트가 존재
+    const mockEvents = [
+      {
+        id: '1',
+        title: '반복되지 않는 일정',
+        date: '2025-10-15',
+        startTime: '09:00',
+        endTime: '10:00',
+        description: '',
+        location: '',
+        category: '업무',
+        repeat: { type: 'none', interval: 0 },
+        notificationTime: 10,
+        seriesId: null,
+      },
+      {
+        id: '2',
+        title: '반복되는 일정',
+        date: '2025-10-16',
+        startTime: '11:00',
+        endTime: '12:00',
+        description: '',
+        location: '',
+        category: '개인',
+        repeat: { type: 'daily', interval: 1 },
+        notificationTime: 10,
+        seriesId: 'series-1',
+      },
+    ];
+    setupMockHandlerUpdating(mockEvents);
+
+    const { user } = setup(<App />);
+
+    // WHEN: 반복 일정의 수정 버튼 클릭 후 다이얼로그에서 '예' 버튼 클릭
+    const recurringEditButton = await screen.findByRole('button', { name: 'Edit event 반복되는 일정' });
+    await user.click(recurringEditButton);
+    act(() => {
+      vi.runOnlyPendingTimers();
+    });
+
+    const dialog = await screen.findByRole('dialog', { name: '일정 수정 확인' });
+    const yesButton = within(dialog).getByRole('button', { name: '예' });
+    await user.click(yesButton);
+    act(() => {
+      vi.runOnlyPendingTimers();
+    });
+
+    // THEN: `PUT /api/events/:id/detach` API가 호출되었고, UI에서 반복 아이콘이 사라졌는지 확인
+    const updatedEventItem = await screen.findByText('반복되는 일정');
+    const updatedEventContainer = updatedEventItem.closest('div');
+    expect(within(updatedEventContainer!).queryByTestId('ReplayIcon')).not.toBeInTheDocument();
+  });
 });
