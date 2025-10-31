@@ -1,5 +1,5 @@
 // src/__tests__/utils/repeatUtils.spec.ts
-import { calculateDailyDates, calculateWeeklyDates, calculateMonthlyDates, calculateYearlyDates } from '../../utils/repeatUtils';
+import { calculateDailyDates, calculateWeeklyDates, calculateMonthlyDates, calculateYearlyDates, expandRecurringEvents } from '../../utils/repeatUtils';
 import { afterEach } from 'vitest';
 
 describe('calculateDailyDates', () => {
@@ -121,5 +121,32 @@ describe('calculateYearlyDates', () => {
     const dayOfMonth = 15;
     const expectedDates = ['2025-01-15', '2026-01-15', '2027-01-15'];
     expect(calculateYearlyDates(startDate, interval, month, dayOfMonth, endDate)).toEqual(expectedDates);
+  });
+});
+
+// RED 단계: Hotfix-Story-006.1 - expandRecurringEvents 단위 테스트
+describe('expandRecurringEvents', () => {
+  it('매일 반복되는 이벤트를 주어진 기간에 맞게 올바르게 확장해야 한다', () => {
+    const dailyEvent = {
+      id: '1',
+      title: '매일 회의',
+      date: '2025-10-15',
+      startTime: '10:00',
+      endTime: '11:00',
+      repeat: { type: 'daily', interval: 1, endDate: '2025-10-17' },
+    };
+    const events = [dailyEvent];
+    const rangeStart = new Date('2025-10-15');
+    const rangeEnd = new Date('2025-10-17');
+
+    const expected = [
+      { ...dailyEvent, date: '2025-10-15' },
+      { ...dailyEvent, date: '2025-10-16' },
+      { ...dailyEvent, date: '2025-10-17' },
+    ];
+
+    const result = expandRecurringEvents(events, rangeStart, rangeEnd);
+    expect(result).toEqual(expect.arrayContaining(expected));
+    expect(result.length).toBe(expected.length);
   });
 });
