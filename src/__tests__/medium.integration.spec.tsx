@@ -869,17 +869,7 @@ describe('반복 일정 삭제 확인 다이얼로그', () => {
     seriesId: null,
   };
 
-  let deleteEventCalled = false;
-
   beforeEach(() => {
-    // deleteEventCalled = false; // Reset for each test
-    // setupMockGetEvents([nonRecurringEvent, recurringEvent]);
-    // server.use(
-    //   http.delete(`/api/events/${nonRecurringEvent.id}`, () => {
-    //     deleteEventCalled = true;
-    //     return HttpResponse.json({});
-    //   })
-    // );
     setupMockHandlerDeletion([nonRecurringEvent, recurringEvent]);
   });
 
@@ -963,7 +953,7 @@ describe('반복 일정 삭제 확인 다이얼로그', () => {
     expect(within(dialog).getByRole('button', { name: '예' })).toBeInTheDocument();
     expect(within(dialog).getByRole('button', { name: '아니오' })).toBeInTheDocument();
 
-    await user.click(within(dialog).getByRole('button', { name: '예' }))
+    await user.click(within(dialog).getByRole('button', { name: '예' }));
 
     act(() => {
       vi.runOnlyPendingTimers();

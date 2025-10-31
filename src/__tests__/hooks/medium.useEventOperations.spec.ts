@@ -98,9 +98,7 @@ describe('useEventOperations', () => {
     server.use(
       http.get('/api/events', () => HttpResponse.json({ events: initialEvents })),
       http.put('/api/events/:id', async () => {
-        server.use(
-          http.get('/api/events', () => HttpResponse.json({ events: [updatedEvent] }))
-        );
+        server.use(http.get('/api/events', () => HttpResponse.json({ events: [updatedEvent] })));
         return HttpResponse.json(updatedEvent);
       })
     );

@@ -55,12 +55,9 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
 
       await fetchEvents();
       onSave?.();
-      enqueueSnackbar(
-        editing || seriesId ? '일정이 수정되었습니다.' : '일정이 추가되었습니다.',
-        {
-          variant: 'success',
-        }
-      );
+      enqueueSnackbar(editing || seriesId ? '일정이 수정되었습니다.' : '일정이 추가되었습니다.', {
+        variant: 'success',
+      });
     } catch (error) {
       console.error('Error saving event:', error);
       enqueueSnackbar('일정 저장 실패', { variant: 'error' });
