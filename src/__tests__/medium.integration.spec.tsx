@@ -733,3 +733,82 @@ describe('반복 일정 수정 확인 다이얼로그', () => {
     expect(within(updatedEventContainer!).queryByTestId('ReplayIcon')).not.toBeInTheDocument();
   });
 });
+
+// RED 단계: Story 10 - 반복 일정 전체 수정 로직 구현
+describe('반복 일정 전체 수정', () => {
+  const seriesId = 'series-xyz';
+  const mockRecurringEvents = [
+    {
+      id: '1',
+      title: '주간 반복 회의',
+      date: '2025-10-13', // Monday
+      startTime: '10:00',
+      endTime: '11:00',
+      description: '',
+      location: '',
+      category: '업무',
+      repeat: { type: 'weekly', interval: 1 },
+      notificationTime: 10,
+      seriesId: seriesId,
+    },
+    {
+      id: '2',
+      title: '주간 반복 회의',
+      date: '2025-10-20', // Next Monday
+      startTime: '10:00',
+      endTime: '11:00',
+      description: '',
+      location: '',
+      category: '업무',
+      repeat: { type: 'weekly', interval: 1 },
+      notificationTime: 10,
+      seriesId: seriesId,
+    },
+  ];
+
+  it("다이얼로그에서 '아니오' 선택 후 전체 일정을 수정하면, 동일한 seriesId를 가진 모든 이벤트가 수정되어야 한다", async () => {
+    // GIVEN: 동일한 seriesId를 가진 여러 이벤트가 존재
+    setupMockGetEvents(mockRecurringEvents);
+    
+    // PUT /api/events-series/:seriesId 핸들러 설정
+    let apiCallVerified = false;
+    server.use(
+      http.put(`/api/events-series/${seriesId}`, async ({ request }) => {
+        apiCallVerified = true;
+        const updatedEventData = await request.json();
+        // 수정된 데이터를 반영하여 이벤트 목록 반환
+        const updatedEvents = mockRecurringEvents.map(event => ({
+          ...event,
+          ...updatedEventData,
+        }));
+        return HttpResponse.json({ events: updatedEvents });
+      })
+    );
+
+    const { user } = setup(<App />);
+
+    // WHEN: 첫 번째 반복 일정의 수정 버튼 클릭
+    const firstEditButton = await screen.findByRole('button', { name: /Edit event 주간 반복 회의/ });
+    await user.click(firstEditButton);
+
+    // 다이얼로그에서 '아니오' 버튼 클릭
+    const dialog = await screen.findByRole('dialog', { name: '일정 수정 확인' });
+    const noButton = within(dialog).getByRole('button', { name: '아니오' });
+    await user.click(noButton);
+
+    // 폼의 제목을 수정하고 저장
+    const titleInput = screen.getByLabelText('제목');
+    await user.clear(titleInput);
+    await user.type(titleInput, '전체 수정된 회의');
+    await user.click(screen.getByTestId('event-submit-button'));
+
+    // THEN:
+    // 1. 올바른 API가 호출되었는지 확인
+    expect(apiCallVerified).toBe(true);
+
+    // 2. UI에 있는 모든 관련 이벤트의 제목이 변경되었는지 확인
+    const updatedEventTitles = await screen.findAllByText('전체 수정된 회의');
+    expect(updatedEventTitles).toHaveLength(mockRecurringEvents.length);
+  });
+});
+
