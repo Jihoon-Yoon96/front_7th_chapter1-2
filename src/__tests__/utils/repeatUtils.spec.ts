@@ -149,4 +149,28 @@ describe('expandRecurringEvents', () => {
     expect(result).toEqual(expect.arrayContaining(expected));
     expect(result.length).toBe(expected.length);
   });
+
+  it('매주 반복되는 이벤트를 주어진 기간에 맞게 올바르게 확장해야 한다', () => {
+    const weeklyEvent = {
+      id: '2',
+      title: '주간 회의',
+      date: '2025-10-13', // 월요일
+      startTime: '09:00',
+      endTime: '10:00',
+      repeat: { type: 'weekly', interval: 1, daysOfWeek: [1], endDate: '2025-10-27' },
+    };
+    const events = [weeklyEvent];
+    const rangeStart = new Date('2025-10-13');
+    const rangeEnd = new Date('2025-10-27');
+
+    const expected = [
+      { ...weeklyEvent, date: '2025-10-13' },
+      { ...weeklyEvent, date: '2025-10-20' },
+      { ...weeklyEvent, date: '2025-10-27' },
+    ];
+
+    const result = expandRecurringEvents(events, rangeStart, rangeEnd);
+    expect(result).toEqual(expect.arrayContaining(expected));
+    expect(result.length).toBe(expected.length);
+  });
 });
