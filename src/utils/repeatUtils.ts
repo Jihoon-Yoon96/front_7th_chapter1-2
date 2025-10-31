@@ -58,7 +58,19 @@ export function expandRecurringEvents(events: Event[], rangeStart: Date, rangeEn
         });
         break;
       }
-      // TODO: yearly 케이스 추가 예정
+      case 'yearly': {
+        if (event.repeat.monthOfYear === undefined || event.repeat.dayOfMonth === undefined) break; // 월, 일자 정보가 없으면 처리하지 않음
+        const repeatEndDate = event.repeat.endDate || new Date(rangeEnd).toISOString().split('T')[0];
+        const dates = calculateYearlyDates(event.date, event.repeat.interval, event.repeat.monthOfYear, event.repeat.dayOfMonth, repeatEndDate);
+
+        dates.forEach(date => {
+          const occurrenceDate = new Date(date);
+          if (occurrenceDate >= rangeStart && occurrenceDate <= rangeEnd) {
+            occurrences.push({ ...event, date });
+          }
+        });
+        break;
+      }
       default:
         break;
     }
