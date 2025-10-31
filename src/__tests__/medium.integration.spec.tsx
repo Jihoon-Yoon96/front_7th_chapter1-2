@@ -590,3 +590,56 @@ describe('반복 종료일 저장', () => {
     expect(requestBody.repeat.endDate).toBeUndefined();
   });
 });
+
+// RED 단계: Story 8 - 반복 일정 수정 확인 다이얼로그 표시
+describe('반복 일정 수정 확인 다이얼로그', () => {
+  beforeEach(() => {
+    setupMockGetEvents([
+      {
+        id: '1',
+        title: '반복되지 않는 일정',
+        date: '2025-10-15',
+        startTime: '09:00',
+        endTime: '10:00',
+        category: '업무',
+        repeat: { type: 'none', interval: 0 },
+      },
+      {
+        id: '2',
+        title: '반복되는 일정',
+        date: '2025-10-16',
+        startTime: '11:00',
+        endTime: '12:00',
+        category: '개인',
+        repeat: { type: 'daily', interval: 1 },
+      },
+    ]);
+  });
+
+  it('일반 일정 수정 시 확인 다이얼로그가 나타나지 않아야 한다', async () => {
+    const { user } = setup(<App />);
+
+    // 일반 일정의 수정 버튼 클릭
+    const nonRecurringEditButton = await screen.findByLabelText('Edit event', { name: '반복되지 않는 일정' });
+    await user.click(nonRecurringEditButton);
+
+    // 다이얼로그가 나타나지 않음을 확인
+    expect(screen.queryByText('해당 일정만 수정하시겠어요?')).not.toBeInTheDocument();
+    // 수정 폼이 나타났는지 확인 (예: 제목 필드)
+    expect(screen.getByLabelText('제목')).toHaveValue('반복되지 않는 일정');
+  });
+
+  it('반복 일정 수정 시 확인 다이얼로그가 나타나야 한다', async () => {
+    const { user } = setup(<App />);
+
+    // 반복 일정의 수정 버튼 클릭
+    const recurringEditButton = await screen.findByLabelText('Edit event', { name: '반복되는 일정' });
+    await user.click(recurringEditButton);
+
+    // 다이얼로그가 나타남을 확인
+    const dialog = await screen.findByRole('dialog', { name: '일정 수정 확인' });
+    expect(within(dialog).getByText('해당 일정만 수정하시겠어요?')).toBeInTheDocument();
+    expect(within(dialog).getByRole('button', { name: '예' })).toBeInTheDocument();
+    expect(within(dialog).getByRole('button', { name: '아니오' })).toBeInTheDocument();
+  });
+});
