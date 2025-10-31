@@ -512,4 +512,30 @@ describe('반복 일정 확장 표시 (통합)', () => {
     const eventTitles = await within(monthView).findAllByText('월간 15일 회의');
     expect(eventTitles).toHaveLength(1); // 해당 월 15일에 1번
   });
+
+  it('매년 반복되는 일정은 월별 뷰의 해당 월/일자에 걸쳐 표시되어야 한다', async () => {
+    // GIVEN: '매년' 2월 29일에 반복되는 일정이 생성된 상태
+    setupMockHandlerCreation([]);
+    const { user } = setup(<App />);
+    await createRecurringEvent(user, {
+      title: '연간 2/29 회의',
+      date: '2024-02-29', // 윤년
+      startTime: '09:00',
+      endTime: '18:00',
+      repeatType: 'yearly', // 매년 반복
+      monthOfYear: 1, // 2월 (0-indexed)
+      dayOfMonth: 29,
+    });
+
+    // WHEN: 2024년 2월 뷰로 이동
+    // (기본 날짜가 2025-10-01이므로, 2024-02-29를 보려면 이동해야 함)
+    // 이 테스트 케이스는 날짜 이동 기능 구현 후 작성해야 합니다.
+    // 현재는 날짜 이동 기능이 없으므로, 이 테스트는 실패합니다.
+    // TODO: 날짜 이동 기능 구현 후, 이 테스트 케이스를 완성해야 합니다.
+    
+    // THEN: 해당 월의 29일에 이벤트가 표시되어야 함
+    const monthView = screen.getByTestId('month-view');
+    const eventTitles = await within(monthView).findAllByText('연간 2/29 회의');
+    expect(eventTitles).toHaveLength(1);
+  });
 });
