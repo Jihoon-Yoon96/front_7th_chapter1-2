@@ -838,3 +838,108 @@ describe('반복 일정 전체 수정', () => {
     expect(updatedEventTitles).toHaveLength(mockRecurringEvents.length);
   });
 });
+
+// RED 단계: Story 11 - 반복 일정 삭제 확인 다이얼로그 표시
+describe('반복 일정 삭제 확인 다이얼로그', () => {
+  const recurringEvent: Event = {
+    id: 'recurring-1',
+    title: '반복되는 삭제 일정',
+    date: '2025-10-17',
+    startTime: '13:00',
+    endTime: '14:00',
+    description: '',
+    location: '',
+    category: '업무',
+    repeat: { type: 'daily', interval: 1 },
+    notificationTime: 10,
+    seriesId: 'delete-series-abc',
+  };
+
+  const nonRecurringEvent: Event = {
+    id: 'non-recurring-1',
+    title: '반복 안되는 삭제 일정',
+    date: '2025-10-18',
+    startTime: '15:00',
+    endTime: '16:00',
+    description: '',
+    location: '',
+    category: '개인',
+    repeat: { type: 'none', interval: 0 },
+    notificationTime: 10,
+    seriesId: null,
+  };
+
+  let deleteEventCalled = false;
+
+  beforeEach(() => {
+    deleteEventCalled = false; // Reset for each test
+    setupMockGetEvents([recurringEvent, nonRecurringEvent]);
+    server.use(
+      http.delete(`/api/events/${nonRecurringEvent.id}`, () => {
+        deleteEventCalled = true;
+        return HttpResponse.json({});
+      })
+    );
+  });
+
+  it('일반 일정 삭제 시 확인 다이얼로그가 나타나지 않고 즉시 삭제되어야 한다', async () => {
+    const { user } = setup(<App />);
+
+    // 일반 일정의 삭제 버튼 클릭
+    const nonRecurringDeleteButton = await screen.findByRole('button', {
+      name: `Delete event ${nonRecurringEvent.title}`,
+    });
+
+    // deleteEvent API 호출을 모킹하여 실제 삭제가 일어나지 않도록 함
+    // 하지만, 테스트는 여전히 deleteEvent가 호출되지 '않고' 다이얼로그가 안 뜨는 것을 확인
+    let deleteEventCalled = false;
+    server.use(
+      http.delete(`/api/events/${nonRecurringEvent.id}`, () => {
+        deleteEventCalled = true;
+        return HttpResponse.json({});
+      })
+    );
+
+    // [REVIEW by Off코치]: 여기서 deleteEvent 호출 시 UI 갱신을 위해 fetchEvents가 호출되므로,
+    // 해당 이벤트를 GET API 응답에서 제거하는 핸들러를 추가해야 합니다.
+    server.use(
+      http.get('/api/events', () => {
+        return HttpResponse.json({ events: [recurringEvent] });
+      })
+    );
+
+    await user.click(nonRecurringDeleteButton);
+    act(() => {
+      vi.runOnlyPendingTimers();
+    });
+
+    // 다이얼로그가 나타나지 않음을 확인
+    expect(screen.queryByRole('dialog', { name: '일정 삭제 확인' })).not.toBeInTheDocument();
+    const eventList = screen.getByTestId('event-list');
+    // 해당 이벤트가 리스트에서 사라졌는지 확인
+    expect(within(eventList).queryByText(nonRecurringEvent.title)).not.toBeInTheDocument();
+    // 다른 이벤트는 여전히 존재하는지 확인
+    expect(within(eventList).getByText(recurringEvent.title)).toBeInTheDocument();
+    expect(deleteEventCalled).toBe(true); // deleteEvent가 호출되었는지 확인
+  });
+
+  it('반복 일정 삭제 시 확인 다이얼로그가 나타나야 한다', async () => {
+    const { user } = setup(<App />);
+
+    // 반복 일정의 삭제 버튼 클릭
+    const recurringDeleteButton = await screen.findByRole('button', {
+      name: `Delete event ${recurringEvent.title}`,
+    });
+    await user.click(recurringDeleteButton);
+
+    act(() => {
+      vi.runOnlyPendingTimers();
+    });
+
+    // 다이얼로그가 나타남을 확인
+    const dialog = await screen.findByRole('dialog', { name: '일정 삭제 확인' });
+    expect(within(dialog).getByText('해당 일정만 삭제하시겠어요?')).toBeInTheDocument();
+    expect(within(dialog).getByRole('button', { name: '예' })).toBeInTheDocument();
+    expect(within(dialog).getByRole('button', { name: '아니오' })).toBeInTheDocument();
+  });
+});

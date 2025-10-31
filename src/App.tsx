@@ -128,7 +128,8 @@ function App() {
   const [isOverlapDialogOpen, setIsOverlapDialogOpen] = useState(false);
   const [overlappingEvents, setOverlappingEvents] = useState<Event[]>([]);
   const [editingSeriesEvent, setEditingSeriesEvent] = useState<Event | null>(null);
-  const [editingSeriesId, setEditingSeriesId] = useState<string | null>(null); // New state for series editing
+  const [editingSeriesId, setEditingSeriesId] = useState<string | null>(null);
+  const [deletingSeriesEvent, setDeletingSeriesEvent] = useState<Event | null>(null); // New state for delete confirmation dialog // New state for series editing
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -606,7 +607,13 @@ function App() {
                     </IconButton>
                     <IconButton
                       aria-label={`Delete event ${event.title}`}
-                      onClick={() => deleteEvent(event.id)}
+                      onClick={() => {
+                        if (event.seriesId) {
+                          setDeletingSeriesEvent(event);
+                        } else {
+                          deleteEvent(event.id);
+                        }
+                      }}
                     >
                       <Delete />
                     </IconButton>
@@ -711,6 +718,40 @@ function App() {
                 editEvent(editingSeriesEvent);
               }
               setEditingSeriesEvent(null);
+            }}
+          >
+            아니오
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* 반복 일정 삭제 확인 다이얼로그 */}
+      <Dialog
+        open={Boolean(deletingSeriesEvent)}
+        onClose={() => setDeletingSeriesEvent(null)}
+        aria-labelledby="delete-recurring-event-dialog-title"
+      >
+        <DialogTitle id="delete-recurring-event-dialog-title">일정 삭제 확인</DialogTitle>
+        <DialogContent>
+          <DialogContentText>해당 일정만 삭제하시겠어요?</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={async () => {
+              if (deletingSeriesEvent) {
+                await deleteEvent(deletingSeriesEvent.id);
+              }
+              setDeletingSeriesEvent(null);
+            }}
+          >
+            예
+          </Button>
+          <Button
+            onClick={async () => {
+              if (deletingSeriesEvent?.seriesId) {
+                // TODO: 전체 시리즈 삭제 로직 구현 (다음 스토리에서)
+                console.log(`Deleting entire series: ${deletingSeriesEvent.seriesId}`);
+              }
+              setDeletingSeriesEvent(null);
             }}
           >
             아니오

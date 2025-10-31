@@ -60,7 +60,13 @@
 - 당신의 산출물은 **지정된 파일 경로에 직접 코드를 작성**하는 것입니다.
 
 ### 7. [Post-Completion Action] (작업 완료 후 조치)
-- TDD의 각 사이클 단계(Tidy, RED, GREEN, REFACTOR)가 마무리되면, 다음 커밋을 수행해야 합니다:
+- TDD의 각 사이클 단계(Tidy, RED, GREEN, REFACTOR)가 마무리되면, 오케스트레이터(사용자)가 커밋을 수행할 수 있도록 **해당 단계의 커밋 메시지를 명확하게 전달해야 합니다.**
+- **예시 (RED 단계 완료 후):**
+    ```
+    [RED] 단계가 완료되었습니다. 다음 커밋 메시지를 사용하세요:
+    `test(feature): Add failing test for new feature`
+    ```
+- 오케스트레이터(사용자)는 전달받은 메시지를 사용하여 다음 커밋을 수행해야 합니다:
     - `git add .`
     - `git commit -m "COMMIT - ({TDD 단계 이름}) [{스토리 제목}] 개발 완료"`
 
