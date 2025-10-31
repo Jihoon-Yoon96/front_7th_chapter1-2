@@ -109,9 +109,12 @@ function App() {
     editEvent,
   } = useEventForm();
 
-  const { events, saveEvent, deleteEvent, detachEventFromSeries } = useEventOperations(
+  const { events, addOrUpdateEvent, deleteEvent, detachEventFromSeries } = useEventOperations(
     Boolean(editingEvent),
-    () => setEditingEvent(null)
+    () => {
+      setEditingEvent(null);
+      setEditingSeriesId(null); // Reset series ID on save
+    }
   );
 
   const { notifications, notifiedEvents, setNotifications } = useNotifications(events);
@@ -124,17 +127,20 @@ function App() {
 
   const [isOverlapDialogOpen, setIsOverlapDialogOpen] = useState(false);
   const [overlappingEvents, setOverlappingEvents] = useState<Event[]>([]);
-  const [editingSeriesEvent, setEditingSeriesEvent] = useState<Event | null>(null); // New state for recurring event dialog
+  const [editingSeriesEvent, setEditingSeriesEvent] = useState<Event | null>(null);
+  const [editingSeriesId, setEditingSeriesId] = useState<string | null>(null); // New state for series editing
 
   const { enqueueSnackbar } = useSnackbar();
 
   const handleEditRecurringEvent = (event: Event) => {
-    console.log('[DEBUG] handleEditRecurringEvent called with:', event);
-    setEditingSeriesEvent(event);
+    if (event.seriesId) {
+      setEditingSeriesEvent(event);
+    } else {
+      editEvent(event);
+    }
   };
 
-  const addOrUpdateEvent = async () => {
-    console.log('[DEBUG] addOrUpdateEvent state:', { isRepeating, repeatType });
+  const submitEvent = async () => {
     if (!title || !date || !startTime || !endTime) {
       enqueueSnackbar('필수 정보를 모두 입력해주세요.', { variant: 'error' });
       return;
@@ -166,14 +172,15 @@ function App() {
         monthOfYear: isRepeating && repeatType === 'yearly' ? monthOfYear : undefined,
       },
       notificationTime,
+      seriesId: editingEvent?.seriesId,
     };
 
     const overlapping = findOverlappingEvents(eventData, listEvents);
-    if (overlapping.length > 0) {
+    if (overlapping.length > 0 && !editingSeriesId) {
       setOverlappingEvents(overlapping);
       setIsOverlapDialogOpen(true);
     } else {
-      await saveEvent(eventData);
+      await addOrUpdateEvent(eventData, editingSeriesId);
       resetForm();
     }
   };
@@ -219,7 +226,7 @@ function App() {
                         const isNotified = notifiedEvents.includes(event.id);
                         return (
                           <Box
-                            key={`${event.id}-${event.date}`}
+                            key={`${event.id}${event.seriesId}${event.startTime}${event.endTime}`}
                             sx={{
                               p: 0.5,
                               my: 0.5,
@@ -489,7 +496,7 @@ function App() {
 
           <Button
             data-testid="event-submit-button"
-            onClick={addOrUpdateEvent}
+            onClick={submitEvent}
             variant="contained"
             color="primary"
           >
@@ -545,15 +552,15 @@ function App() {
           {listEvents.length === 0 ? (
             <Typography>검색 결과가 없습니다.</Typography>
           ) : (
-            listEvents.map((event) => (
+            listEvents.map((event, index) => (
               <Box
-                key={`${event.id}-${event.date}`}
+                key={`${event.id}-${event.date}-${index}`}
                 sx={{ border: 1, borderRadius: 2, p: 3, width: '100%' }}
               >
                 <Stack direction="row" justifyContent="space-between">
                   <Stack>
                     <Stack direction="row" spacing={1} alignItems="center">
-                      {event.repeat.type !== 'none' && <ReplayIcon data-testid="ReplayIcon" />}
+                      {event.seriesId && <ReplayIcon data-testid="ReplayIcon" />}
                       {notifiedEvents.includes(event.id) && <Notifications color="error" />}
                       <Typography
                         fontWeight={notifiedEvents.includes(event.id) ? 'bold' : 'normal'}
@@ -592,7 +599,7 @@ function App() {
                   <Stack>
                     <IconButton
                       aria-label={`Edit event ${event.title}`}
-                      onClick={() => editEvent(event, handleEditRecurringEvent)}
+                      onClick={() => handleEditRecurringEvent(event)}
                     >
                       <Edit />
                     </IconButton>
@@ -629,7 +636,7 @@ function App() {
             color="error"
             onClick={() => {
               setIsOverlapDialogOpen(false);
-              saveEvent({
+              addOrUpdateEvent({
                 id: editingEvent ? editingEvent.id : undefined,
                 title,
                 date,
@@ -687,10 +694,9 @@ function App() {
         <DialogActions>
           <Button
             onClick={async () => {
-              // '예' (단일 수정) 로직
               if (editingSeriesEvent) {
                 await detachEventFromSeries(editingSeriesEvent.id);
-                editEvent(editingSeriesEvent, undefined); // 폼에 이벤트 정보 채우기
+                editEvent(editingSeriesEvent);
               }
               setEditingSeriesEvent(null);
             }}
@@ -699,8 +705,10 @@ function App() {
           </Button>
           <Button
             onClick={() => {
-              // '아니오' (전체 수정) 로직
-              // TODO: 전체 수정 로직 구현
+              if (editingSeriesEvent) {
+                setEditingSeriesId(editingSeriesEvent.seriesId);
+                editEvent(editingSeriesEvent);
+              }
               setEditingSeriesEvent(null);
             }}
           >

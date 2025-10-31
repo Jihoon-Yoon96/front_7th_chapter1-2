@@ -10,13 +10,22 @@ import { Event } from '../types';
 
 export function expandRecurringEvents(events: Event[], rangeStart: Date, rangeEnd: Date): Event[] {
   const occurrences: Event[] = [];
+  const addedKeys = new Set<string>(); // Track added event keys (id-date)
+
+  const addOccurrence = (event: Event, date: string) => {
+    const key = `${event.id}-${date}`;
+    if (!addedKeys.has(key)) {
+      occurrences.push({ ...event, date });
+      addedKeys.add(key);
+    }
+  };
 
   events.forEach((event) => {
     switch (event.repeat.type) {
       case 'none': {
         const eventDate = new Date(event.date);
         if (eventDate >= rangeStart && eventDate <= rangeEnd) {
-          occurrences.push(event);
+          addOccurrence(event, event.date);
         }
         break;
       }
@@ -28,7 +37,7 @@ export function expandRecurringEvents(events: Event[], rangeStart: Date, rangeEn
         dates.forEach((date) => {
           const occurrenceDate = new Date(date);
           if (occurrenceDate >= rangeStart && occurrenceDate <= rangeEnd) {
-            occurrences.push({ ...event, date });
+            addOccurrence(event, date);
           }
         });
         break;
@@ -47,7 +56,7 @@ export function expandRecurringEvents(events: Event[], rangeStart: Date, rangeEn
         dates.forEach((date) => {
           const occurrenceDate = new Date(date);
           if (occurrenceDate >= rangeStart && occurrenceDate <= rangeEnd) {
-            occurrences.push({ ...event, date });
+            addOccurrence(event, date);
           }
         });
         break;
@@ -66,7 +75,7 @@ export function expandRecurringEvents(events: Event[], rangeStart: Date, rangeEn
         dates.forEach((date) => {
           const occurrenceDate = new Date(date);
           if (occurrenceDate >= rangeStart && occurrenceDate <= rangeEnd) {
-            occurrences.push({ ...event, date });
+            addOccurrence(event, date);
           }
         });
         break;
@@ -86,7 +95,7 @@ export function expandRecurringEvents(events: Event[], rangeStart: Date, rangeEn
         dates.forEach((date) => {
           const occurrenceDate = new Date(date);
           if (occurrenceDate >= rangeStart && occurrenceDate <= rangeEnd) {
-            occurrences.push({ ...event, date });
+            addOccurrence(event, date);
           }
         });
         break;

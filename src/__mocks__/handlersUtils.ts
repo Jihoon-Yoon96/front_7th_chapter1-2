@@ -72,8 +72,8 @@ export const setupMockHandlerUpdating = (initialEvents?: Event[]) => {
   );
 };
 
-export const setupMockHandlerDeletion = () => {
-  const mockEvents: Event[] = [
+export const setupMockHandlerDeletion = (initialEvent: Event[]) => {
+  const mockEvents: Event[] = initialEvent || [
     {
       id: '1',
       title: '삭제할 이벤트',

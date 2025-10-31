@@ -21,32 +21,40 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
     }
   };
 
-  const saveEvent = async (eventData: Event | EventForm) => {
+  const addOrUpdateEvent = async (eventData: Event | EventForm, seriesId?: string | null) => {
     try {
       let response;
-      if (editing) {
-        response = await fetch(`/api/events/${(eventData as Event).id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(eventData),
-        });
-      } else {
-        response = await fetch('/api/events', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(eventData),
-        });
+      let url = '/api/events';
+      let method = 'POST';
+
+      if (seriesId) {
+        url = `/api/events-series/${seriesId}`;
+        method = 'PUT';
+      } else if (editing) {
+        url = `/api/events/${(eventData as Event).id}`;
+        method = 'PUT';
       }
 
+      response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(eventData),
+      });
+
       if (!response.ok) {
+        const errorBody = await response.text();
+        console.error('Failed to save event:', errorBody);
         throw new Error('Failed to save event');
       }
 
       await fetchEvents();
       onSave?.();
-      enqueueSnackbar(editing ? '일정이 수정되었습니다.' : '일정이 추가되었습니다.', {
-        variant: 'success',
-      });
+      enqueueSnackbar(
+        editing || seriesId ? '일정이 수정되었습니다.' : '일정이 추가되었습니다.',
+        {
+          variant: 'success',
+        }
+      );
     } catch (error) {
       console.error('Error saving event:', error);
       enqueueSnackbar('일정 저장 실패', { variant: 'error' });
@@ -93,5 +101,5 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
     }
   };
 
-  return { events, fetchEvents, saveEvent, deleteEvent, detachEventFromSeries };
+  return { events, fetchEvents, addOrUpdateEvent, deleteEvent, detachEventFromSeries };
 };

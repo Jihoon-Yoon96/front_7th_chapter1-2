@@ -769,27 +769,34 @@ describe('반복 일정 전체 수정', () => {
   it("다이얼로그에서 '아니오' 선택 후 전체 일정을 수정하면, 동일한 seriesId를 가진 모든 이벤트가 수정되어야 한다", async () => {
     // GIVEN: 동일한 seriesId를 가진 여러 이벤트가 존재
     setupMockGetEvents(mockRecurringEvents);
-    
+
     // PUT /api/events-series/:seriesId 핸들러 설정
     let apiCallVerified = false;
     server.use(
       http.put(`/api/events-series/${seriesId}`, async ({ request }) => {
         apiCallVerified = true;
         const updatedEventData = await request.json();
-        // 수정된 데이터를 반영하여 이벤트 목록 반환
-        const updatedEvents = mockRecurringEvents.map(event => ({
+        const updatedEvents = mockRecurringEvents.map((event) => ({
           ...event,
-          ...updatedEventData,
+          ...(updatedEventData as Partial<Event>),
         }));
-        return HttpResponse.json({ events: updatedEvents });
+
+        // [Review by Off코치]: PUT 요청 후 이어지는 GET 요청이 수정된 데이터를 반환하도록 핸들러를 재설정합니다.
+        server.use(
+          http.get('/api/events', () => {
+            return HttpResponse.json({ events: updatedEvents });
+          })
+        );
+
+        return HttpResponse.json(updatedEvents[0]); // PUT 응답은 보통 단일 개체나 성공 여부를 반환합니다.
       })
     );
 
     const { user } = setup(<App />);
 
     // WHEN: 첫 번째 반복 일정의 수정 버튼 클릭
-    const firstEditButton = await screen.findByRole('button', { name: /Edit event 주간 반복 회의/ });
-    await user.click(firstEditButton);
+    const editButtons = await screen.findAllByRole('button', { name: /Edit event 주간 반복 회의/ });
+    await user.click(editButtons[0]);
 
     // 다이얼로그에서 '아니오' 버튼 클릭
     const dialog = await screen.findByRole('dialog', { name: '일정 수정 확인' });
@@ -811,4 +818,3 @@ describe('반복 일정 전체 수정', () => {
     expect(updatedEventTitles).toHaveLength(mockRecurringEvents.length);
   });
 });
-
