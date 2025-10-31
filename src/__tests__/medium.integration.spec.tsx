@@ -11,6 +11,7 @@ import {
   setupMockHandlerDeletion,
   setupMockHandlerUpdating,
   setupMockGetEvents,
+  setupMockPostRequestHandler,
 } from '../__mocks__/handlersUtils';
 import App from '../App';
 import { server } from '../setupTests';
@@ -404,5 +405,30 @@ describe('반복 일정 시각적 표시 (사용자 시나리오)', () => {
     const replayIcon = within(newEventContainer!).getByTestId('ReplayIcon');
 
     expect(replayIcon).toBeInTheDocument();
+  });
+});
+
+// RED 단계: Story 7 - 반복 종료일 저장
+describe('반복 종료일 저장', () => {
+  it('사용자가 입력한 반복 종료일이 API 요청에 올바르게 포함되어야 한다.', async () => {
+    // GIVEN
+    let requestBody: any;
+    setupMockPostRequestHandler((body) => {
+      requestBody = body;
+    });
+    const { user } = setup(<App />);
+    const endDateToSubmit = '2025-10-31';
+
+    // WHEN
+    await user.type(screen.getByLabelText('제목'), '종료일 테스트');
+    await user.type(screen.getByLabelText('날짜'), '2025-10-01');
+    await user.type(screen.getByLabelText('시작 시간'), '10:00');
+    await user.type(screen.getByLabelText('종료 시간'), '11:00');
+    await user.click(screen.getByLabelText('반복 일정'));
+    await user.type(screen.getByLabelText('반복 종료일'), endDateToSubmit);
+    await user.click(screen.getByTestId('event-submit-button'));
+
+    // THEN
+    expect(requestBody.repeat.endDate).toBe(endDateToSubmit);
   });
 });
