@@ -369,9 +369,9 @@ describe('반복 일정 유형 선택 UI 통합 테스트', () => {
 
 const createRecurringEvent = async (
   user: UserEvent,
-  options: { title: string; date: string; startTime: string; endTime: string; repeatType: 'daily' | 'weekly' | 'monthly' | 'yearly'; daysOfWeek?: number[] }
+  options: { title: string; date: string; startTime: string; endTime: string; repeatType: 'daily' | 'weekly' | 'monthly' | 'yearly'; daysOfWeek?: number[]; dayOfMonth?: number }
 ) => {
-  const { title, date, startTime, endTime, repeatType, daysOfWeek } = options;
+  const { title, date, startTime, endTime, repeatType, daysOfWeek, dayOfMonth } = options;
 
   await user.type(screen.getByLabelText('제목'), title);
   await user.type(screen.getByLabelText('날짜'), date);
@@ -385,6 +385,12 @@ const createRecurringEvent = async (
     for (const dayIndex of daysOfWeek) {
       await user.click(await screen.findByRole('checkbox', { name: dayLabels[dayIndex] }));
     }
+  }
+
+  if (repeatType === 'monthly' && dayOfMonth) {
+    const dayOfMonthInput = await screen.findByLabelText('일자');
+    await user.clear(dayOfMonthInput);
+    await user.type(dayOfMonthInput, String(dayOfMonth));
   }
 
   await user.click(screen.getByTestId('event-submit-button'));

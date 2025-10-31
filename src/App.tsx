@@ -142,6 +142,7 @@ function App() {
         interval: repeatInterval,
         endDate: repeatEndDate || undefined,
         daysOfWeek: repeatType === 'weekly' ? daysOfWeek : undefined,
+        dayOfMonth: repeatType === 'monthly' ? dayOfMonth : undefined,
       },
       notificationTime,
     };
