@@ -8,9 +8,13 @@ import { expandRecurringEvents } from '../utils/repeatUtils';
 export const useSearch = (events: Event[], currentDate: Date, view: 'week' | 'month') => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredEvents = useMemo(() => {
-    const searchedEvents = getFilteredEvents(events, searchTerm, currentDate, view);
+  // For the right-hand side list: filter by search term AND date range
+  const listEvents = useMemo(() => {
+    return getFilteredEvents(events, searchTerm, currentDate, view);
+  }, [events, searchTerm, currentDate, view]);
 
+  // For the calendar views: expand the list events
+  const calendarEvents = useMemo(() => {
     let rangeStart: Date;
     let rangeEnd: Date;
 
@@ -23,12 +27,13 @@ export const useSearch = (events: Event[], currentDate: Date, view: 'week' | 'mo
       rangeEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59, 999);
     }
 
-    return expandRecurringEvents(searchedEvents, rangeStart, rangeEnd);
-  }, [events, searchTerm, currentDate, view]);
+    return expandRecurringEvents(listEvents, rangeStart, rangeEnd);
+  }, [listEvents, currentDate, view]);
 
   return {
     searchTerm,
     setSearchTerm,
-    filteredEvents,
+    listEvents,
+    calendarEvents,
   };
 };

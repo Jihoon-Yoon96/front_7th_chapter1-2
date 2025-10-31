@@ -109,7 +109,7 @@ function App() {
 
   const { notifications, notifiedEvents, setNotifications } = useNotifications(events);
   const { view, setView, currentDate, holidays, navigate } = useCalendarView();
-  const { searchTerm, filteredEvents, setSearchTerm } = useSearch(events, currentDate, view);
+  const { searchTerm, listEvents, calendarEvents, setSearchTerm } = useSearch(events, currentDate, view);
 
   const [isOverlapDialogOpen, setIsOverlapDialogOpen] = useState(false);
   const [overlappingEvents, setOverlappingEvents] = useState<Event[]>([]);
@@ -142,7 +142,8 @@ function App() {
         interval: repeatInterval,
         endDate: repeatEndDate || undefined,
         daysOfWeek: repeatType === 'weekly' ? daysOfWeek : undefined,
-        dayOfMonth: repeatType === 'monthly' ? dayOfMonth : undefined,
+        dayOfMonth: (repeatType === 'monthly' || repeatType === 'yearly') ? dayOfMonth : undefined,
+        monthOfYear: repeatType === 'yearly' ? monthOfYear : undefined,
       },
       notificationTime,
     };
@@ -190,7 +191,7 @@ function App() {
                     <Typography variant="body2" fontWeight="bold">
                       {date.getDate()}
                     </Typography>
-                    {filteredEvents
+                    {calendarEvents
                       .filter(
                         (event) => new Date(event.date).toDateString() === date.toDateString()
                       )
@@ -281,7 +282,7 @@ function App() {
                                 {holiday}
                               </Typography>
                             )}
-                            {getEventsForDay(filteredEvents, day).map((event) => {
+                            {getEventsForDay(calendarEvents, day).map((event) => {
                               const isNotified = notifiedEvents.includes(event.id);
                               return (
                                 <Box
@@ -521,10 +522,10 @@ function App() {
             />
           </FormControl>
 
-          {filteredEvents.length === 0 ? (
+          {listEvents.length === 0 ? (
             <Typography>검색 결과가 없습니다.</Typography>
           ) : (
-            filteredEvents.map((event) => (
+            listEvents.map((event) => (
               <Box key={`${event.id}-${event.date}`} sx={{ border: 1, borderRadius: 2, p: 3, width: '100%' }}>
                 <Stack direction="row" justifyContent="space-between">
                   <Stack>

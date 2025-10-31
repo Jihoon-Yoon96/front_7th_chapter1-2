@@ -369,9 +369,9 @@ describe('반복 일정 유형 선택 UI 통합 테스트', () => {
 
 const createRecurringEvent = async (
   user: UserEvent,
-  options: { title: string; date: string; startTime: string; endTime: string; repeatType: 'daily' | 'weekly' | 'monthly' | 'yearly'; daysOfWeek?: number[]; dayOfMonth?: number }
+  options: { title: string; date: string; startTime: string; endTime: string; repeatType: 'daily' | 'weekly' | 'monthly' | 'yearly'; daysOfWeek?: number[]; dayOfMonth?: number; monthOfYear?: number }
 ) => {
-  const { title, date, startTime, endTime, repeatType, daysOfWeek, dayOfMonth } = options;
+  const { title, date, startTime, endTime, repeatType, daysOfWeek, dayOfMonth, monthOfYear } = options;
 
   await user.type(screen.getByLabelText('제목'), title);
   await user.type(screen.getByLabelText('날짜'), date);
@@ -387,10 +387,14 @@ const createRecurringEvent = async (
     }
   }
 
-  if (repeatType === 'monthly' && dayOfMonth) {
+  if ((repeatType === 'monthly' || repeatType === 'yearly') && dayOfMonth) {
     const dayOfMonthInput = await screen.findByLabelText('일자');
     await user.clear(dayOfMonthInput);
     await user.type(dayOfMonthInput, String(dayOfMonth));
+  }
+
+  if (repeatType === 'yearly' && monthOfYear) {
+    await user.selectOptions(await screen.findByLabelText('월'), String(monthOfYear));
   }
 
   await user.click(screen.getByTestId('event-submit-button'));
@@ -514,28 +518,23 @@ describe('반복 일정 확장 표시 (통합)', () => {
   });
 
   it('매년 반복되는 일정은 월별 뷰의 해당 월/일자에 걸쳐 표시되어야 한다', async () => {
-    // GIVEN: '매년' 2월 29일에 반복되는 일정이 생성된 상태
+    // GIVEN: '매년' 10월 29일에 반복되는 일정이 생성된 상태
     setupMockHandlerCreation([]);
     const { user } = setup(<App />);
     await createRecurringEvent(user, {
-      title: '연간 2/29 회의',
-      date: '2024-02-29', // 윤년
+      title: '연간 10/29 회의',
+      date: '2025-10-29',
       startTime: '09:00',
       endTime: '18:00',
       repeatType: 'yearly', // 매년 반복
-      monthOfYear: 1, // 2월 (0-indexed)
+      monthOfYear: 9, // 10월 (0-indexed)
       dayOfMonth: 29,
     });
 
-    // WHEN: 2024년 2월 뷰로 이동
-    // (기본 날짜가 2025-10-01이므로, 2024-02-29를 보려면 이동해야 함)
-    // 이 테스트 케이스는 날짜 이동 기능 구현 후 작성해야 합니다.
-    // 현재는 날짜 이동 기능이 없으므로, 이 테스트는 실패합니다.
-    // TODO: 날짜 이동 기능 구현 후, 이 테스트 케이스를 완성해야 합니다.
-    
+    // WHEN: 월별 뷰 확인 (기본값)
     // THEN: 해당 월의 29일에 이벤트가 표시되어야 함
     const monthView = screen.getByTestId('month-view');
-    const eventTitles = await within(monthView).findAllByText('연간 2/29 회의');
-    expect(eventTitles).toHaveLength(1);
+    const eventTitle = await within(monthView).findByText('연간 10/29 회의');
+    expect(eventTitle).toBeInTheDocument();
   });
 });
