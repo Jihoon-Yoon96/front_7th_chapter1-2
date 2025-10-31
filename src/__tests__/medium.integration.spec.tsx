@@ -538,3 +538,50 @@ describe('반복 일정 확장 표시 (통합)', () => {
     expect(eventTitle).toBeInTheDocument();
   });
 });
+
+// Story 7 - 반복 종료일 저장
+describe('반복 종료일 저장', () => {
+  it('사용자가 입력한 반복 종료일이 API 요청에 올바르게 포함되어야 한다.', async () => {
+    // GIVEN
+    let requestBody: any;
+    setupMockPostRequestHandler((body) => {
+      requestBody = body;
+    });
+    const { user } = setup(<App />);
+    const endDateToSubmit = '2025-10-31';
+
+    // WHEN
+    await user.type(screen.getByLabelText('제목'), '종료일 테스트');
+    await user.type(screen.getByLabelText('날짜'), '2025-10-01');
+    await user.type(screen.getByLabelText('시작 시간'), '10:00');
+    await user.type(screen.getByLabelText('종료 시간'), '11:00');
+    await user.click(screen.getByLabelText('반복 일정'));
+    await user.type(screen.getByLabelText('반복 종료일'), endDateToSubmit);
+    await user.click(screen.getByTestId('event-submit-button'));
+
+    // THEN
+    expect(requestBody.repeat.endDate).toBe(endDateToSubmit);
+  });
+
+  it('반복 일정이 아닐 경우, repeat.endDate는 API 요청에 포함되지 않아야 한다', async () => {
+    // GIVEN
+    let requestBody: any;
+    setupMockPostRequestHandler((body) => {
+      requestBody = body;
+    });
+    const { user } = setup(<App />);
+    const endDateToSubmit = '2025-10-31';
+
+    // WHEN
+    await user.type(screen.getByLabelText('제목'), '단일 일정');
+    await user.type(screen.getByLabelText('날짜'), '2025-10-01');
+    await user.type(screen.getByLabelText('시작 시간'), '10:00');
+    await user.type(screen.getByLabelText('종료 시간'), '11:00');
+    // '반복 일정' 체크박스를 클릭하지 않음 (isRepeating: false)
+    await user.type(screen.getByLabelText('반복 종료일'), endDateToSubmit); // 종료일은 입력하지만, 반복은 아님
+    await user.click(screen.getByTestId('event-submit-button'));
+
+    // THEN
+    expect(requestBody.repeat.endDate).toBeUndefined();
+  });
+});
