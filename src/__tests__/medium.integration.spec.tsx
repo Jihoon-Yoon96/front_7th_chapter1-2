@@ -942,4 +942,44 @@ describe('반복 일정 삭제 확인 다이얼로그', () => {
     expect(within(dialog).getByRole('button', { name: '예' })).toBeInTheDocument();
     expect(within(dialog).getByRole('button', { name: '아니오' })).toBeInTheDocument();
   });
+
+  it("반복 일정 삭제 다이얼로그에서 '예' 버튼 클릭 시, 해당 이벤트가 단일 일정으로 삭제되어야 한다", async () => {
+    // GIVEN: seriesId를 가진 반복 이벤트가 존재
+    let deleteApiCalled = false;
+    server.use(
+      http.delete(`/api/events/${recurringEvent.id}`, () => {
+        deleteApiCalled = true;
+        return HttpResponse.json({});
+      }),
+      http.get('/api/events', () => {
+        // 삭제 후에는 해당 이벤트가 없는 상태를 모킹
+        return HttpResponse.json({ events: [nonRecurringEvent] });
+      })
+    );
+    const { user } = setup(<App />);
+
+    // WHEN: 반복 일정의 삭제 버튼 클릭 후 다이얼로그에서 '예' 버튼 클릭
+    const recurringDeleteButton = await screen.findByRole('button', {
+      name: `Delete event ${recurringEvent.title}`,
+    });
+    await user.click(recurringDeleteButton);
+
+    act(() => {
+      vi.runOnlyPendingTimers();
+    });
+
+    const dialog = await screen.findByRole('dialog', { name: '일정 삭제 확인' });
+    const yesButton = within(dialog).getByRole('button', { name: '예' });
+    await user.click(yesButton);
+
+    act(() => {
+      vi.runOnlyPendingTimers();
+    });
+
+    // THEN: `DELETE /api/events/:id` API가 호출되었고, UI에서 해당 이벤트가 사라졌는지 확인
+    expect(deleteApiCalled).toBe(true);
+    const eventList = screen.getByTestId('event-list');
+    expect(within(eventList).queryByText(recurringEvent.title)).not.toBeInTheDocument();
+    expect(within(eventList).getByText(nonRecurringEvent.title)).toBeInTheDocument();
+  });
 });
