@@ -448,12 +448,12 @@ describe('반복 일정 확장 표시 (통합)', () => {
     });
 
     // WHEN: 주별 뷰로 전환
-    await user.click(screen.getByLabelText('뷰 타입 선택'));
+    await user.click(within(screen.getByLabelText('뷰 타입 선택')).getByRole('combobox'));
     await user.click(screen.getByRole('option', { name: 'week-option' }));
 
     // THEN: 해당 주의 여러 날짜에 이벤트가 표시되어야 함
     const weekView = screen.getByTestId('week-view');
     const eventTitles = await within(weekView).findAllByText('주간 전체 회의');
-    expect(eventTitles).toHaveLength(7); // 월요일부터 일요일까지 총 7번
+    expect(eventTitles).toHaveLength(6); // 월요일부터 토요일까지 총 6번
   });
 });

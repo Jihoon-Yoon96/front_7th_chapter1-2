@@ -196,7 +196,7 @@ function App() {
                         const isNotified = notifiedEvents.includes(event.id);
                         return (
                           <Box
-                            key={event.id}
+                            key={`${event.id}-${event.date}`}
                             sx={{
                               p: 0.5,
                               my: 0.5,
@@ -283,7 +283,7 @@ function App() {
                               const isNotified = notifiedEvents.includes(event.id);
                               return (
                                 <Box
-                                  key={event.id}
+                                  key={`${event.id}-${event.date}`}
                                   sx={{
                                     p: 0.5,
                                     my: 0.5,
@@ -523,7 +523,7 @@ function App() {
             <Typography>검색 결과가 없습니다.</Typography>
           ) : (
             filteredEvents.map((event) => (
-              <Box key={event.id} sx={{ border: 1, borderRadius: 2, p: 3, width: '100%' }}>
+              <Box key={`${event.id}-${event.date}`} sx={{ border: 1, borderRadius: 2, p: 3, width: '100%' }}>
                 <Stack direction="row" justifyContent="space-between">
                   <Stack>
                     <Stack direction="row" spacing={1} alignItems="center">
