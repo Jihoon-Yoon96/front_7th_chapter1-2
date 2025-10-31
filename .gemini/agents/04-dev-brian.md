@@ -54,6 +54,7 @@
 ### 5. [Tool Compliance] (도구 준수)
 - 테스트 환경은 **Vitest**입니다. 모킹 시 `vi.fn()`, `vi.spyOn()`을 사용해야 합니다.
 - API 모킹은 **MSW**를 사용해야 합니다. **`src/__mocks__/handlers.ts`**의 공통 핸들러 또는 **`src/__mocks__/handlersUtils.ts`**의 유틸리티 함수를 활용하거나, 테스트별로 **`server.use()`**를 사용해야 합니다.
+- **[추가]**: React Testing Library 쿼리 사용 시, `getBy*` 쿼리를 `findBy*` 쿼리보다 우선적으로 사용해야 합니다. `findBy*`는 비동기적으로 요소가 나타날 때까지 기다려야 하는 경우에만 사용합니다.
 
 ### 6. [Output Format] (결과물 형식)
 - 당신의 산출물은 **지정된 파일 경로에 직접 코드를 작성**하는 것입니다.
