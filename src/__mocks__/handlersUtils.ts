@@ -20,8 +20,8 @@ export const setupMockHandlerCreation = (initEvents = [] as Event[]) => {
   );
 };
 
-export const setupMockHandlerUpdating = () => {
-  const mockEvents: Event[] = [
+export const setupMockHandlerUpdating = (initialEvents?: Event[]) => {
+  const mockEvents: Event[] = initialEvents || [
     {
       id: '1',
       title: '기존 회의',
@@ -33,6 +33,7 @@ export const setupMockHandlerUpdating = () => {
       category: '업무',
       repeat: { type: 'none', interval: 0 },
       notificationTime: 10,
+      seriesId: null,
     },
     {
       id: '2',
@@ -45,6 +46,7 @@ export const setupMockHandlerUpdating = () => {
       category: '업무',
       repeat: { type: 'none', interval: 0 },
       notificationTime: 10,
+      seriesId: null,
     },
   ];
 
@@ -58,6 +60,13 @@ export const setupMockHandlerUpdating = () => {
       const index = mockEvents.findIndex((event) => event.id === id);
 
       mockEvents[index] = { ...mockEvents[index], ...updatedEvent };
+      return HttpResponse.json(mockEvents[index]);
+    }),
+    http.put('/api/events/:id/detach', ({ params }) => {
+      const { id } = params;
+      const index = mockEvents.findIndex((event) => event.id === id);
+      mockEvents[index].seriesId = null;
+      mockEvents[index].repeat = { type: 'none', interval: 0 };
       return HttpResponse.json(mockEvents[index]);
     })
   );

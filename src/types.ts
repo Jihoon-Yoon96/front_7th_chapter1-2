@@ -24,4 +24,5 @@ export interface EventForm {
 
 export interface Event extends EventForm {
   id: string;
+  seriesId: string | null; // 반복 일정 그룹 ID (단일 일정일 경우 null)
 }
