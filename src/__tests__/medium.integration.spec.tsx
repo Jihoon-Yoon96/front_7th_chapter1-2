@@ -456,4 +456,27 @@ describe('반복 일정 확장 표시 (통합)', () => {
     const eventTitles = await within(weekView).findAllByText('주간 전체 회의');
     expect(eventTitles).toHaveLength(6); // 월요일부터 토요일까지 총 6번
   });
+
+  it('매주 반복되는 일정은 주별 뷰의 해당 요일에 걸쳐 표시되어야 한다', async () => {
+    // GIVEN: '매주' 월요일에 반복되는 일정이 생성된 상태
+    setupMockHandlerCreation([]);
+    const { user } = setup(<App />);
+    await createRecurringEvent(user, {
+      title: '주간 월요일 회의',
+      date: '2025-09-29', // 월요일
+      startTime: '10:00',
+      endTime: '11:00',
+      repeatType: 'weekly', // 매주 반복
+      daysOfWeek: [1], // 월요일 (0:일, 1:월, ...)
+    });
+
+    // WHEN: 주별 뷰로 전환
+    await user.click(within(screen.getByLabelText('뷰 타입 선택')).getByRole('combobox'));
+    await user.click(screen.getByRole('option', { name: 'week-option' }));
+
+    // THEN: 해당 주의 월요일에 이벤트가 표시되어야 함
+    const weekView = screen.getByTestId('week-view');
+    const eventTitles = await within(weekView).findAllByText('주간 월요일 회의');
+    expect(eventTitles).toHaveLength(1); // 해당 주 월요일에 1번
+  });
 });
