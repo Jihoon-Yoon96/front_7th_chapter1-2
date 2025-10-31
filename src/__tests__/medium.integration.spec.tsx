@@ -1,6 +1,6 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { render, screen, within, act } from '@testing-library/react';
+import { render, screen, within, act, waitFor } from '@testing-library/react';
 import { UserEvent, userEvent } from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { SnackbarProvider } from 'notistack';
@@ -16,6 +16,14 @@ import {
 import App from '../App';
 import { server } from '../setupTests';
 import { Event } from '../types';
+
+vi.mock('../hooks/useNotifications', () => ({
+  useNotifications: () => ({
+    notifications: [],
+    notifiedEvents: [],
+    setNotifications: vi.fn(),
+  }),
+}));
 
 const theme = createTheme();
 
@@ -86,7 +94,8 @@ describe('일정 CRUD 및 기본 기능', () => {
 
     setupMockHandlerUpdating();
 
-    await user.click(await screen.findByLabelText('Edit event'));
+    const editButtons = await screen.findAllByRole('button', { name: /Edit event/ });
+    await user.click(editButtons[0]);
 
     await user.clear(screen.getByLabelText('제목'));
     await user.type(screen.getByLabelText('제목'), '수정된 회의');
@@ -108,7 +117,7 @@ describe('일정 CRUD 및 기본 기능', () => {
     expect(await eventList.findByText('삭제할 이벤트')).toBeInTheDocument();
 
     // 삭제 버튼 클릭
-    const allDeleteButton = await screen.findAllByLabelText('Delete event');
+    const allDeleteButton = await screen.findAllByRole('button', { name: /Delete event/ });
     await user.click(allDeleteButton[0]);
 
     expect(eventList.queryByText('삭제할 이벤트')).not.toBeInTheDocument();
@@ -309,7 +318,7 @@ describe('일정 충돌', () => {
 
     const { user } = setup(<App />);
 
-    const editButton = (await screen.findAllByLabelText('Edit event'))[1];
+    const editButton = (await screen.findAllByRole('button', { name: /Edit event/ }))[1];
     await user.click(editButton);
 
     // 시간 수정하여 다른 일정과 충돌 발생
@@ -601,8 +610,11 @@ describe('반복 일정 수정 확인 다이얼로그', () => {
         date: '2025-10-15',
         startTime: '09:00',
         endTime: '10:00',
+        description: '',
+        location: '',
         category: '업무',
         repeat: { type: 'none', interval: 0 },
+        notificationTime: 10,
       },
       {
         id: '2',
@@ -610,8 +622,11 @@ describe('반복 일정 수정 확인 다이얼로그', () => {
         date: '2025-10-16',
         startTime: '11:00',
         endTime: '12:00',
+        description: '',
+        location: '',
         category: '개인',
         repeat: { type: 'daily', interval: 1 },
+        notificationTime: 10,
       },
     ]);
   });
@@ -620,7 +635,7 @@ describe('반복 일정 수정 확인 다이얼로그', () => {
     const { user } = setup(<App />);
 
     // 일반 일정의 수정 버튼 클릭
-    const nonRecurringEditButton = await screen.findByLabelText('Edit event', { name: '반복되지 않는 일정' });
+    const nonRecurringEditButton = await screen.findByRole('button', { name: 'Edit event 반복되지 않는 일정' });
     await user.click(nonRecurringEditButton);
 
     // 다이얼로그가 나타나지 않음을 확인
@@ -633,8 +648,13 @@ describe('반복 일정 수정 확인 다이얼로그', () => {
     const { user } = setup(<App />);
 
     // 반복 일정의 수정 버튼 클릭
-    const recurringEditButton = await screen.findByLabelText('Edit event', { name: '반복되는 일정' });
+    const recurringEditButton = await screen.findByRole('button', { name: 'Edit event 반복되는 일정' });
     await user.click(recurringEditButton);
+
+    // Fake Timers 환경에서 user-event로 인한 상태 업데이트를 수동으로 실행
+    act(() => {
+      vi.runOnlyPendingTimers();
+    });
 
     // 다이얼로그가 나타남을 확인
     const dialog = await screen.findByRole('dialog', { name: '일정 수정 확인' });

@@ -113,8 +113,14 @@ function App() {
 
   const [isOverlapDialogOpen, setIsOverlapDialogOpen] = useState(false);
   const [overlappingEvents, setOverlappingEvents] = useState<Event[]>([]);
+  const [editingSeriesEvent, setEditingSeriesEvent] = useState<Event | null>(null); // New state for recurring event dialog
 
   const { enqueueSnackbar } = useSnackbar();
+
+  const handleEditRecurringEvent = (event: Event) => {
+    console.log('[DEBUG] handleEditRecurringEvent called with:', event);
+    setEditingSeriesEvent(event);
+  };
 
   const addOrUpdateEvent = async () => {
     console.log('[DEBUG] addOrUpdateEvent state:', { isRepeating, repeatType });
@@ -148,7 +154,7 @@ function App() {
       notificationTime,
     };
 
-    const overlapping = findOverlappingEvents(eventData, events);
+    const overlapping = findOverlappingEvents(eventData, listEvents);
     if (overlapping.length > 0) {
       setOverlappingEvents(overlapping);
       setIsOverlapDialogOpen(true);
@@ -567,10 +573,10 @@ function App() {
                     </Typography>
                   </Stack>
                   <Stack>
-                    <IconButton aria-label="Edit event" onClick={() => editEvent(event)}>
+                    <IconButton aria-label={`Edit event ${event.title}`} onClick={() => editEvent(event, handleEditRecurringEvent)}>
                       <Edit />
                     </IconButton>
-                    <IconButton aria-label="Delete event" onClick={() => deleteEvent(event.id)}>
+                    <IconButton aria-label={`Delete event ${event.title}`} onClick={() => deleteEvent(event.id)}>
                       <Delete />
                     </IconButton>
                   </Stack>
@@ -644,6 +650,34 @@ function App() {
           ))}
         </Stack>
       )}
+
+      {/* 반복 일정 수정 확인 다이얼로그 */}
+      <Dialog
+        open={Boolean(editingSeriesEvent)}
+        onClose={() => setEditingSeriesEvent(null)}
+        aria-labelledby="edit-recurring-event-dialog-title"
+      >
+        <DialogTitle id="edit-recurring-event-dialog-title">일정 수정 확인</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            해당 일정만 수정하시겠어요?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => {
+            // '예' (단일 수정) 로직
+            if (editingSeriesEvent) {
+              editEvent(editingSeriesEvent, undefined); // 폼에 이벤트 정보 채우기
+            }
+            setEditingSeriesEvent(null);
+          }}>예</Button>
+          <Button onClick={() => {
+            // '아니오' (전체 수정) 로직
+            // TODO: 전체 수정 로직 구현
+            setEditingSeriesEvent(null);
+          }}>아니오</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

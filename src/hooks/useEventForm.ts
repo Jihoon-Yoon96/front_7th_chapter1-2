@@ -59,7 +59,7 @@ export const useEventForm = (initialEvent?: Event) => {
     setNotificationTime(10);
   };
 
-  const editEvent = (event: Event) => {
+  const editEvent = (event: Event, onEditRecurringEvent?: (event: Event) => void) => {
     setEditingEvent(event);
     setTitle(event.title);
     setDate(event.date);
@@ -76,6 +76,10 @@ export const useEventForm = (initialEvent?: Event) => {
     setDayOfMonth(event.repeat.dayOfMonth || 1);
     setMonthOfYear(event.repeat.monthOfYear || 0);
     setNotificationTime(event.notificationTime);
+
+    if (event.repeat.type !== 'none' && onEditRecurringEvent) {
+      onEditRecurringEvent(event);
+    }
   };
 
   return {
