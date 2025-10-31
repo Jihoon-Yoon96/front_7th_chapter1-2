@@ -151,6 +151,17 @@ function App() {
       return;
     }
 
+    const repeatOptions = isRepeating
+      ? {
+          type: repeatType,
+          interval: repeatInterval,
+          endDate: repeatEndDate || undefined,
+          daysOfWeek: repeatType === 'weekly' ? daysOfWeek : undefined,
+          dayOfMonth: repeatType === 'monthly' || repeatType === 'yearly' ? dayOfMonth : undefined,
+          monthOfYear: repeatType === 'yearly' ? monthOfYear : undefined,
+        }
+      : { type: 'none', interval: 0 };
+
     const eventData: Event | EventForm = {
       id: editingEvent ? editingEvent.id : undefined,
       title,
@@ -160,17 +171,7 @@ function App() {
       description,
       location,
       category,
-      repeat: {
-        type: isRepeating ? repeatType : 'none',
-        interval: isRepeating ? repeatInterval : 0,
-        endDate: isRepeating ? repeatEndDate || undefined : undefined,
-        daysOfWeek: isRepeating && repeatType === 'weekly' ? daysOfWeek : undefined,
-        dayOfMonth:
-          isRepeating && (repeatType === 'monthly' || repeatType === 'yearly')
-            ? dayOfMonth
-            : undefined,
-        monthOfYear: isRepeating && repeatType === 'yearly' ? monthOfYear : undefined,
-      },
+      repeat: repeatOptions,
       notificationTime,
       seriesId: editingEvent?.seriesId,
     };

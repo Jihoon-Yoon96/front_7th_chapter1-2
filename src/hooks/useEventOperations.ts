@@ -23,19 +23,25 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
 
   const addOrUpdateEvent = async (eventData: Event | EventForm, seriesId?: string | null) => {
     try {
-      let response;
-      let url = '/api/events';
-      let method = 'POST';
+      let url: string;
+      let method: 'POST' | 'PUT';
 
-      if (seriesId) {
-        url = `/api/events-series/${seriesId}`;
-        method = 'PUT';
-      } else if (editing) {
-        url = `/api/events/${(eventData as Event).id}`;
-        method = 'PUT';
+      switch (true) {
+        case Boolean(seriesId): // 반복 시리즈 수정
+          url = `/api/events-series/${seriesId}`;
+          method = 'PUT';
+          break;
+        case editing: // 단일 이벤트 수정
+          url = `/api/events/${(eventData as Event).id}`;
+          method = 'PUT';
+          break;
+        default: // 새 이벤트 생성
+          url = '/api/events';
+          method = 'POST';
+          break;
       }
 
-      response = await fetch(url, {
+      const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(eventData),

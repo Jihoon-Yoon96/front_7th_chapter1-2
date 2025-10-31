@@ -15,7 +15,7 @@ import {
 } from '../__mocks__/handlersUtils';
 import App from '../App';
 import { server } from '../setupTests';
-import { Event } from '../types';
+import { Event, EventForm } from '../types';
 
 vi.mock('../hooks/useNotifications', () => ({
   useNotifications: () => ({
@@ -422,7 +422,25 @@ const createRecurringEvent = async (
 describe('반복 일정 시각적 표시 (사용자 시나리오)', () => {
   it("사용자가 '매일' 반복 일정을 생성하면, 해당 일정 목록에 반복 아이콘이 표시된다", async () => {
     // 1. [GIVEN]
-    setupMockHandlerCreation([]);
+    server.use(
+      http.post('/api/events', async ({ request }) => {
+        const newEvent = (await request.json()) as EventForm;
+        const eventWithId: Event = {
+          ...newEvent,
+          id: 'mock-id-123',
+          seriesId: 'mock-series-id-456', // Simulate backend generating a seriesId
+        };
+
+        // [Review by Off코치]: POST 요청 후 이어지는 GET 요청이 새 이벤트를 포함하도록 핸들러를 재설정합니다.
+        server.use(
+          http.get('/api/events', () => {
+            return HttpResponse.json({ events: [eventWithId] });
+          })
+        );
+
+        return HttpResponse.json(eventWithId);
+      })
+    );
     const { user } = setup(<App />);
 
     // 2. [WHEN]
@@ -438,7 +456,7 @@ describe('반복 일정 시각적 표시 (사용자 시나리오)', () => {
     const eventList = screen.getByTestId('event-list');
     const newEventItem = await within(eventList).findByText('매일 반복 회의');
     const newEventContainer = newEventItem.closest('div');
-    const replayIcon = within(newEventContainer!).getByTestId('ReplayIcon');
+    const replayIcon = await within(newEventContainer!).findByTestId('ReplayIcon');
 
     expect(replayIcon).toBeInTheDocument();
   });
@@ -624,6 +642,7 @@ describe('반복 일정 수정 확인 다이얼로그', () => {
         category: '업무',
         repeat: { type: 'none', interval: 0 },
         notificationTime: 10,
+        seriesId: null,
       },
       {
         id: '2',
@@ -636,6 +655,7 @@ describe('반복 일정 수정 확인 다이얼로그', () => {
         category: '개인',
         repeat: { type: 'daily', interval: 1 },
         notificationTime: 10,
+        seriesId: 'series-abc', // [Review by Off코치]: seriesId를 추가하여 반복 일정임을 명시합니다.
       },
     ]);
   });
