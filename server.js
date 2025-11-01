@@ -115,6 +115,30 @@ app.put('/api/events/:id', async (req, res) => {
   }
 });
 
+app.put('/api/events/:id/detach', async (req, res) => {
+  const events = await getEvents();
+  const id = req.params.id;
+  const eventIndex = events.events.findIndex((event) => event.id === id);
+  if (eventIndex > -1) {
+    const newEvents = [...events.events];
+    const eventToDetach = { ...newEvents[eventIndex] };
+    delete eventToDetach.seriesId;
+    eventToDetach.repeat = { type: 'none', interval: 0 };
+    newEvents[eventIndex] = eventToDetach;
+
+    fs.writeFileSync(
+      `${__dirname}/src/__mocks__/response/${dbName}`,
+      JSON.stringify({
+        events: newEvents,
+      })
+    );
+
+    res.json(eventToDetach);
+  } else {
+    res.status(404).send('Event not found');
+  }
+});
+
 app.delete('/api/events/:id', async (req, res) => {
   const events = await getEvents();
   const id = req.params.id;
