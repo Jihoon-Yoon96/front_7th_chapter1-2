@@ -124,6 +124,7 @@ function App() {
     currentDate,
     view
   );
+  console.log('calendarEvents', calendarEvents);
 
   const [isOverlapDialogOpen, setIsOverlapDialogOpen] = useState(false);
   const [overlappingEvents, setOverlappingEvents] = useState<Event[]>([]);
@@ -218,7 +219,7 @@ function App() {
                     }}
                   >
                     <Typography variant="body2" fontWeight="bold">
-                      {date.getDate()}
+                      {date.getDate()+1}
                     </Typography>
                     {calendarEvents
                       .filter(
@@ -608,6 +609,7 @@ function App() {
                     <IconButton
                       aria-label={`Delete event ${event.title}`}
                       onClick={() => {
+                        console.log('[DEBUG] Deleting Event:', event); // 디버깅 로그 추가
                         if (event.seriesId) {
                           setDeletingSeriesEvent(event);
                         } else {

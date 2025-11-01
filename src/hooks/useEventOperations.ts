@@ -14,6 +14,7 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
         throw new Error('Failed to fetch events');
       }
       const { events } = await response.json();
+      console.log('[DEBUG] Fetched Events:', events); // 디버깅 로그 추가
       setEvents(events);
     } catch (error) {
       console.error('Error fetching events:', error);
