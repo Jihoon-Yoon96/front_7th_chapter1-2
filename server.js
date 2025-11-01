@@ -118,7 +118,7 @@ app.put('/api/events/:id', async (req, res) => {
 app.put('/api/events/:id/detach', async (req, res) => {
   const events = await getEvents();
   const id = req.params.id;
-  const eventIndex = events.events.findIndex((event) => event.id === id);
+  const eventIndex = events.events.findIndex((event) => event.id === id && event.seriesId);
   if (eventIndex > -1) {
     const newEvents = [...events.events];
     const eventToDetach = { ...newEvents[eventIndex] };
