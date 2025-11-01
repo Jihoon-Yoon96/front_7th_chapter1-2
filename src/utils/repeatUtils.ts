@@ -127,7 +127,6 @@ export function calculateDailyDates(
     // Date 객체를 직접 수정하여 루프마다 새 객체 생성을 피함
     currentDate.setDate(currentDate.getDate() + interval);
   }
-  console.log('calculateDailyDates'), dates;
   return dates;
 }
 

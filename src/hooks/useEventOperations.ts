@@ -26,7 +26,6 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
     try {
       let url: string;
       let method: 'POST' | 'PUT';
-      debugger
 
       switch (true) {
         case Boolean(seriesId): // 반복 시리즈 수정

@@ -219,7 +219,7 @@ function App() {
                     }}
                   >
                     <Typography variant="body2" fontWeight="bold">
-                      {date.getDate()+1}
+                      {date.getDate()}
                     </Typography>
                     {calendarEvents
                       .filter(
