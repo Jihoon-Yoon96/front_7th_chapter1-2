@@ -26,13 +26,18 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
     try {
       let url: string;
       let method: 'POST' | 'PUT';
+      debugger
 
       switch (true) {
         case Boolean(seriesId): // 반복 시리즈 수정
           url = `/api/events-series/${seriesId}`;
           method = 'PUT';
           break;
-        case editing: // 단일 이벤트 수정
+        case editing && eventData.repeat.type !== 'none' && !eventData.seriesId: // 단일 이벤트를 반복 이벤트로 변경
+          url = `/api/events/convert-to-recurring`;
+          method = 'POST';
+          break;
+        case editing: // 단일 이벤트 수정 (반복 아님)
           url = `/api/events/${(eventData as Event).id}`;
           method = 'PUT';
           break;

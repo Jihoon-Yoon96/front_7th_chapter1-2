@@ -94,6 +94,97 @@ app.post('/api/events', async (req, res) => {
   }
 });
 
+app.post('/api/events/convert-to-recurring', async (req, res) => {
+  const events = await getEvents();
+  const eventData = req.body;
+
+  // 기존 단일 이벤트 삭제
+  const remainingEvents = events.events.filter((event) => event.id !== eventData.id);
+
+  const { repeat, date, ...restOfEvent } = eventData;
+  const { type, interval = 1, endDate } = repeat;
+
+  if (!endDate) {
+    return res.status(400).send('endDate is required for recurring events.');
+  }
+
+  const seriesId = randomUUID();
+  const createdEvents = [];
+  let currentDate = new Date(date);
+  const finalDate = new Date(endDate);
+
+  while (currentDate <= finalDate) {
+    createdEvents.push({
+      ...restOfEvent,
+      id: randomUUID(),
+      date: currentDate.toISOString().split('T')[0],
+      seriesId,
+      repeat,
+    });
+
+    switch (type) {
+      case 'daily':
+        currentDate.setDate(currentDate.getDate() + interval);
+        break;
+      case 'weekly':
+        currentDate.setDate(currentDate.getDate() + 7 * interval);
+        break;
+      case 'monthly':
+        currentDate.setMonth(currentDate.getMonth() + interval);
+        break;
+      case 'yearly':
+        currentDate.setFullYear(currentDate.getFullYear() + interval);
+        break;
+      default:
+        currentDate.setTime(finalDate.getTime() + 1);
+        break;
+    }
+  }
+
+  fs.writeFileSync(
+    `${__dirname}/src/__mocks__/response/${dbName}`,
+    JSON.stringify({
+      events: [...remainingEvents, ...createdEvents],
+    })
+  );
+
+  res.status(201).json(createdEvents);
+});
+
+app.put('/api/events-series/:seriesId', async (req, res) => {
+  const events = await getEvents();
+  const seriesId = req.params.seriesId;
+  const updateData = req.body;
+
+  const seriesEvents = events.events.filter((event) => event.seriesId === seriesId);
+
+  if (seriesEvents.length === 0) {
+    return res.status(404).send('Recurring series not found');
+  }
+
+  const newEvents = events.events.map((event) => {
+    if (event.seriesId === seriesId) {
+      return {
+        ...event,
+        title: updateData.title || event.title,
+        description: updateData.description || event.description,
+        location: updateData.location || event.location,
+        category: updateData.category || event.category,
+        notificationTime: updateData.notificationTime || event.notificationTime,
+        repeat: updateData.repeat ? { ...event.repeat, ...updateData.repeat } : event.repeat,
+      };
+    }
+    return event;
+  });
+
+  fs.writeFileSync(
+    `${__dirname}/src/__mocks__/response/${dbName}`,
+    JSON.stringify({ events: newEvents })
+  );
+
+  res.json(seriesEvents);
+});
+
 app.put('/api/events/:id', async (req, res) => {
   const events = await getEvents();
   const id = req.params.id;
